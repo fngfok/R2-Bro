@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>🤖 R2 Bro</h1>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Player Profile</h2>
+        <% if (player && player.name) { %>
+            <p><strong>Name:</strong> <%= player.name %></p>
+            <p><strong>Ally Code:</strong> <%= player.allyCode %></p>
+            <p><strong>Level:</strong> <%= player.level %></p>
+            <p><strong>GP:</strong> <%= (player.galacticPower / 1e6).toFixed(2) %>M</p>
+        <% } else { %>
+            <p>Player not found.</p>
+        <% } %>
+    </main>
+    <footer>
+        <p>&copy; 2025 R2 Bro</p>
+    </footer>
+    <script src="/js/script.js"></script>
+</body>
+</html>
