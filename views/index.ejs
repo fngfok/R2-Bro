@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <h1>🤖 R2 Bro</h1>
+        <nav>
+            <a href="/">Home</a>
+        </nav>
+    </header>
+    <main>
+        <h2>Welcome to R2 Bro!</h2>
+        <p>Your ultimate astromech companion for Star Wars: Galaxy of Heroes.</p>
+        <form action="/player-search" method="POST">
+            <input type="text" name="allyCode" placeholder="Enter Ally Code (e.g., 123456789)" required>
+            <button type="submit">Search Player</button>
+        </form>
+    </main>
+    <footer>
+        <p>&copy; 2025 R2 Bro</p>
+    </footer>
+    <script src="/js/script.js"></script>
+</body>
+</html>
