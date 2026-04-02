@@ -8,6 +8,7 @@ describe('Security and Validation', () => {
     expect(response.headers['x-frame-options']).toBe('DENY');
     expect(response.headers['x-xss-protection']).toBe('1; mode=block');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
+    expect(response.headers['x-powered-by']).toBeUndefined();
   });
 
   test('should reject invalid ally code in search', async () => {
