@@ -2,6 +2,7 @@ const express = require('express');
 const ComlinkStub = require('@swgoh-utils/comlink');
 const NodeCache = require('node-cache');
 const path = require('path');
+const Player = require('./models/player');
 
 const app = express();
 const port = process.env.PORT || 4200;
@@ -75,7 +76,8 @@ app.get('/player/:allyCode', async (req, res) => {
       playerData = await comlink.getPlayer(sanitizedAllyCode);
       cache.set(cacheKey, playerData);
     }
-    res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: playerData });
+    const player = new Player(playerData);
+    res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
     console.error('Error fetching player data:', error);
     res.status(500).render('error', { message: 'Failed to fetch player data' });
