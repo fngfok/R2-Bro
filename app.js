@@ -32,7 +32,8 @@ const comlink = new ComlinkStub({
 });
 
 // Cache initialization (TTL: 1 hour)
-const cache = new NodeCache({ stdTTL: 3600 });
+// Optimization: disabled cloning for better performance since cached objects are not mutated
+const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
 // View engine setup
 app.set('view engine', 'ejs');
