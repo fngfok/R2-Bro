@@ -6,6 +6,9 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 4200;
 
+// Security: Disable X-Powered-By header to avoid revealing framework information
+app.disable('x-powered-by');
+
 // Security Middleware
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
