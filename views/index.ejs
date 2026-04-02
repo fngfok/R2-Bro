@@ -16,8 +16,9 @@
     <main>
         <h2>Welcome to R2 Bro!</h2>
         <p>Your ultimate astromech companion for Star Wars: Galaxy of Heroes.</p>
-        <form action="/player-search" method="POST">
+        <form id="search-form" action="/player-search" method="POST">
             <input
+                class="search-input"
                 type="text"
                 name="allyCode"
                 placeholder="Enter Ally Code (e.g., 123456789)"
@@ -27,7 +28,7 @@
                 title="Ally code must be 9 digits"
                 aria-label="Enter Ally Code"
             >
-            <button type="submit">Search Player</button>
+            <button id="search-button" class="search-button" type="submit">Search Player</button>
         </form>
     </main>
     <footer>
