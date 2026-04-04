@@ -1,0 +1,3 @@
+## 2025-05-14 - [Ally Code Input Flexibility and Feedback]
+**Learning:** Users often copy-paste ally codes from various sources that include dashes or spaces. Restricting input to only 9 digits creates friction. Providing a flexible pattern that allows common delimiters, paired with a visible label and immediate submission feedback, significantly improves the primary user journey.
+**Action:** Always allow flexible delimiters (dashes, spaces) in ID-like inputs and sanitize them on both frontend (pattern) and backend (regex replacement) before processing. Ensure a visible `<label>` is present for better cognitive accessibility, even if `aria-label` or `placeholder` are used.
