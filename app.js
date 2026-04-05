@@ -6,6 +6,9 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 4200;
 
+// Optimization: Disable x-powered-by header to reduce response size and improve security
+app.disable('x-powered-by');
+
 // Security Middleware
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -38,9 +41,12 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// Optimization: Enable EJS view caching to avoid redundant template parsing
+app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Set maxAge to 1 day for browser-side caching of static assets
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
