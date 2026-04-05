@@ -25,10 +25,16 @@ describe('Security and Validation', () => {
     expect(response.status).toBe(400);
   });
 
-  test('should accept valid ally code with dashes', async () => {
-    const response = await request(app)
+  test('should accept valid ally code with dashes or spaces', async () => {
+    let response = await request(app)
       .post('/player-search')
       .send('allyCode=123-456-789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+
+    response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/player/123456789');
   });
