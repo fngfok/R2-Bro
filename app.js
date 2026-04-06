@@ -4,6 +4,8 @@ const NodeCache = require('node-cache');
 const path = require('path');
 
 const app = express();
+// Disable X-Powered-By to reduce server fingerprinting and information leakage about the tech stack
+app.disable('x-powered-by');
 const port = process.env.PORT || 4200;
 
 // Security Middleware
@@ -12,6 +14,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  // Content Security Policy to mitigate XSS and other injection attacks by restricting resource loading
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; object-src 'none'");
   next();
 });
 
