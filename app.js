@@ -38,9 +38,15 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// Optimization: Enable view caching to avoid redundant disk reads and template parsing.
+// Note: This is usually default in production, but explicitly set for consistent performance.
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Enable browser caching for static assets for 24 hours to reduce repeat requests.
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
