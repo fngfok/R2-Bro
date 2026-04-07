@@ -10,16 +10,18 @@ const port = process.env.PORT || 4200;
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('X-XSS-Protection', '0'); // CSP is used for modern browsers
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';");
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   next();
 });
 
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
-  // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx)
-  const cleaned = allyCode.replace(/-/g, '');
+  // Ally codes are 9-digit numbers, sometimes formatted with dashes or spaces (xxx-xxx-xxx or xxx xxx xxx)
+  const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
 }
 
@@ -41,8 +43,8 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // Routes
 app.get('/', (req, res) => {

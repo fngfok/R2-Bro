@@ -6,8 +6,19 @@ describe('Security and Validation', () => {
     const response = await request(app).get('/');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['x-frame-options']).toBe('DENY');
-    expect(response.headers['x-xss-protection']).toBe('1; mode=block');
+    expect(response.headers['x-xss-protection']).toBe('0');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
+    expect(response.headers['strict-transport-security']).toContain('preload');
+    expect(response.headers['content-security-policy']).toContain("default-src 'self'");
+    expect(response.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+  });
+
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
   });
 
   test('should reject invalid ally code in search', async () => {
