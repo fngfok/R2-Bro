@@ -18,8 +18,8 @@ app.use((req, res, next) => {
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
-  // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx)
-  const cleaned = allyCode.replace(/-/g, '');
+  // Ally codes are 9-digit numbers, sometimes formatted with dashes or spaces (xxx-xxx-xxx or xxx xxx xxx)
+  const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
 }
 
