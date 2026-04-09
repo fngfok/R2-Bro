@@ -39,8 +39,14 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+// Optimization: enable EJS view caching in production for faster rendering
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
+
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: enabled browser caching (1 day) to reduce server load and improve load times
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
