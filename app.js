@@ -10,17 +10,23 @@ const port = process.env.PORT || 4200;
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('X-XSS-Protection', '0'); // Defer to CSP
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:;");
+  res.setHeader('Referrer-Policy', 'no-referrer-when-downgrade');
   next();
 });
 
-// Helper for ally code validation
+// Helper for ally code sanitization and validation
+function getSanitizedAllyCode(allyCode) {
+  if (typeof allyCode !== 'string') return '';
+  // Remove any non-digit characters (like dashes or spaces)
+  return allyCode.replace(/\D/g, '');
+}
+
 function isValidAllyCode(allyCode) {
-  if (typeof allyCode !== 'string') return false;
-  // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx)
-  const cleaned = allyCode.replace(/-/g, '');
-  return /^\d{9}$/.test(cleaned);
+  const sanitized = getSanitizedAllyCode(allyCode);
+  return /^\d{9}$/.test(sanitized);
 }
 
 // Initialize Comlink Stub
@@ -41,8 +47,9 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Hardened body parsers with limits to mitigate DoS risks
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // Routes
 app.get('/', (req, res) => {
@@ -51,11 +58,10 @@ app.get('/', (req, res) => {
 
 app.post('/player-search', (req, res) => {
   const { allyCode } = req.body;
-  if (!allyCode || !isValidAllyCode(allyCode)) {
+  if (!isValidAllyCode(allyCode)) {
     return res.status(400).render('error', { message: 'Invalid Ally Code. Please enter a 9-digit number.' });
   }
-  // Sanitize: remove any non-digit characters (like dashes)
-  const sanitizedAllyCode = allyCode.replace(/\D/g, '');
+  const sanitizedAllyCode = getSanitizedAllyCode(allyCode);
   res.redirect(`/player/${sanitizedAllyCode}`);
 });
 
@@ -66,7 +72,7 @@ app.get('/player/:allyCode', async (req, res) => {
     return res.status(400).render('error', { message: 'Invalid Ally Code. Please enter a 9-digit number.' });
   }
 
-  const sanitizedAllyCode = allyCode.replace(/\D/g, '');
+  const sanitizedAllyCode = getSanitizedAllyCode(allyCode);
   const cacheKey = `player_${sanitizedAllyCode}`;
 
   try {
