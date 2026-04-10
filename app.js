@@ -40,7 +40,8 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Added 1-day max-age for browser caching of static assets
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
