@@ -38,9 +38,18 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+// Optimization: Enable view caching in production to improve rendering performance
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
+
+// Optimization: Disable X-Powered-By header to reduce response size and improve security
+app.disable('x-powered-by');
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Set maxAge for static assets to 1 day in production to leverage browser caching
+const staticOptions = process.env.NODE_ENV === 'production' ? { maxAge: '1d' } : {};
+app.use(express.static(path.join(__dirname, 'public'), staticOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
