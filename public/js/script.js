@@ -1,1 +1,23 @@
-console.log('R2 Bro scripts loaded.');
+document.addEventListener('DOMContentLoaded', () => {
+    const searchForm = document.getElementById('search-form');
+    const searchButton = document.getElementById('search-button');
+
+    if (searchForm && searchButton) {
+        searchForm.addEventListener('submit', () => {
+            searchButton.dataset.originalText = searchButton.textContent;
+            searchButton.disabled = true;
+            searchButton.textContent = 'Searching...';
+        });
+    }
+});
+
+// Re-enable button on page show (handles BFCache when navigating back)
+window.addEventListener('pageshow', (event) => {
+    if (event.persisted) {
+        const searchButton = document.getElementById('search-button');
+        if (searchButton && searchButton.dataset.originalText) {
+            searchButton.disabled = false;
+            searchButton.textContent = searchButton.dataset.originalText;
+        }
+    }
+});
