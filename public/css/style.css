@@ -26,3 +26,9 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+/* Accessible focus states */
+:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
+}
