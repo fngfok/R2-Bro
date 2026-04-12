@@ -8,6 +8,10 @@ describe('Security and Validation', () => {
     expect(response.headers['x-frame-options']).toBe('DENY');
     expect(response.headers['x-xss-protection']).toBe('1; mode=block');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
+    expect(response.headers['content-security-policy']).toBe("default-src 'self'");
+    expect(response.headers['referrer-policy']).toBe('no-referrer');
+    expect(response.headers['x-permitted-cross-domain-policies']).toBe('none');
+    expect(response.headers['x-powered-by']).toBeUndefined();
   });
 
   test('should reject invalid ally code in search', async () => {
@@ -35,6 +39,14 @@ describe('Security and Validation', () => {
 
   test('should reject invalid ally code in direct URL', async () => {
     const response = await request(app).get('/player/123-abc-456');
+    expect(response.status).toBe(400);
+  });
+
+  test('should reject excessively long ally code', async () => {
+    const longAllyCode = '1'.repeat(21);
+    const response = await request(app)
+      .post('/player-search')
+      .send(`allyCode=${longAllyCode}`);
     expect(response.status).toBe(400);
   });
 });
