@@ -26,3 +26,21 @@ footer {
     bottom: 0;
     width: 100%;
 }
+
+/* Accessibility & Interaction Polish */
+:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
+}
+
+#search-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+#search-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
