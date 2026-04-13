@@ -8,6 +8,10 @@ describe('Security and Validation', () => {
     expect(response.headers['x-frame-options']).toBe('DENY');
     expect(response.headers['x-xss-protection']).toBe('1; mode=block');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
+    expect(response.headers['content-security-policy']).toBe("default-src 'self'");
+    expect(response.headers['referrer-policy']).toBe('no-referrer');
+    expect(response.headers['x-permitted-cross-domain-policies']).toBe('none');
+    expect(response.headers['x-powered-by']).toBeUndefined();
   });
 
   test('should reject invalid ally code in search', async () => {
@@ -22,6 +26,13 @@ describe('Security and Validation', () => {
     const response = await request(app)
       .post('/player-search')
       .send('allyCode=1234567890');
+    expect(response.status).toBe(400);
+  });
+
+  test('should reject extremely long ally code input', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=' + '1'.repeat(21));
     expect(response.status).toBe(400);
   });
 

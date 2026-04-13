@@ -6,18 +6,26 @@ const path = require('path');
 const app = express();
 const port = process.env.PORT || 4200;
 
+// Disable X-Powered-By header for security
+app.disable('x-powered-by');
+
 // Security Middleware
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  res.setHeader('Content-Security-Policy', "default-src 'self'");
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
   next();
 });
 
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
+  // Security enhancement: enforce a maximum length to prevent processing extremely long strings
+  if (allyCode.length > 20) return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx)
   const cleaned = allyCode.replace(/-/g, '');
   return /^\d{9}$/.test(cleaned);
@@ -41,8 +49,9 @@ app.set('views', path.join(__dirname, 'views'));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security enhancement: implement payload size limits and use simple query string parsing
+app.use(express.json({ limit: '1kb' }));
+app.use(express.urlencoded({ extended: false, limit: '1kb' }));
 
 // Routes
 app.get('/', (req, res) => {
