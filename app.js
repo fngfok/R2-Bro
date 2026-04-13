@@ -39,8 +39,12 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Static files with caching in production (1 day maxAge)
+// Optimization: Reduces repeat page load time by serving assets from browser cache
+const staticOptions = process.env.NODE_ENV === 'production'
+  ? { maxAge: '1d' }
+  : {};
+app.use(express.static(path.join(__dirname, 'public'), staticOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
