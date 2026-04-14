@@ -1,3 +1,9 @@
+# 🎨 Palette's Journal
+
+## 2025-05-15 - [Immediate Feedback with Loading States]
+**Learning:** For asynchronous operations like player searches, users benefit significantly from immediate visual feedback. Disabling the submit button and changing its text to "Searching..." prevents duplicate submissions and confirms the action is being processed.
+**Action:** Always implement loading states for form submissions that involve network requests to improve responsiveness and prevent race conditions.
+
 ## 2025-05-22 - [Refining CSS for Micro-UX]
 **Learning:** Avoid global tag styling (e.g., `button`, `input`) in `style.css` to prevent unintended side effects across the app. Use targeted classes instead.
 **Action:** When implementing a micro-UX improvement, define specific CSS classes (e.g., `.search-button`) and apply them only to the relevant elements in the template.
