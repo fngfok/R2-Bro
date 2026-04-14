@@ -48,7 +48,12 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Enable browser caching for static assets in production (max-age: 1 day).
+// This reduces redundant requests for CSS, JS, and images, improving repeat-load performance.
+const staticOptions = process.env.NODE_ENV === 'production'
+  ? { maxAge: '1d' }
+  : {};
+app.use(express.static(path.join(__dirname, 'public'), staticOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
