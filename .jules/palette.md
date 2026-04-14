@@ -1,3 +1,11 @@
+## 2025-05-22 - [Refining CSS for Micro-UX]
+**Learning:** Avoid global tag styling (e.g., `button`, `input`) in `style.css` to prevent unintended side effects across the app. Use targeted classes instead.
+**Action:** When implementing a micro-UX improvement, define specific CSS classes (e.g., `.search-button`) and apply them only to the relevant elements in the template.
+
+## 2025-05-22 - [Loading State Feedback]
+**Learning:** Providing immediate visual feedback (e.g., disabling the button and changing its text to "Searching... 🤖") prevents multiple submissions and improves the perceived speed of the application.
+**Action:** Always implement a loading state for primary actions that involve external API calls or long-running processes.
+
 ## 2026-04-05 - SWGOH Ally Code UX Pattern
 **Learning:** For game-specific identifiers like SWGOH Ally Codes, users frequently use dashes or spaces for readability. The UI and backend should support these formats even if the core logic uses a raw 9-digit number.
 **Action:** Use `pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"` on the frontend and `replace(/[- ]/g, '')` on the backend for robust input handling.
