@@ -8,6 +8,7 @@ describe('Security and Validation', () => {
     expect(response.headers['x-frame-options']).toBe('DENY');
     expect(response.headers['x-xss-protection']).toBe('1; mode=block');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
+    expect(response.headers['x-powered-by']).toBeUndefined();
   });
 
   test('should reject invalid ally code in search', async () => {
@@ -25,10 +26,16 @@ describe('Security and Validation', () => {
     expect(response.status).toBe(400);
   });
 
-  test('should accept valid ally code with dashes', async () => {
-    const response = await request(app)
+  test('should accept valid ally code with dashes or spaces', async () => {
+    let response = await request(app)
       .post('/player-search')
       .send('allyCode=123-456-789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+
+    response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/player/123456789');
   });

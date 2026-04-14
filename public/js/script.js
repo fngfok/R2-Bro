@@ -1,12 +1,13 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const searchForm = document.querySelector('form[action="/player-search"]');
-    if (searchForm) {
+    const searchForm = document.getElementById('search-form');
+    const searchButton = document.getElementById('search-button');
+
+    if (searchForm && searchButton) {
         searchForm.addEventListener('submit', () => {
-            const submitButton = searchForm.querySelector('button[type="submit"]');
-            if (submitButton) {
-                submitButton.disabled = true;
-                submitButton.textContent = 'Searching...';
-            }
+            searchButton.disabled = true;
+            searchButton.innerText = 'Searching... 🤖';
         });
     }
+
+    console.log('R2 Bro scripts loaded.');
 });
