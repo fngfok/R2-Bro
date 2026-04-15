@@ -49,7 +49,10 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: add long-term caching for static assets in production (1 day)
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
