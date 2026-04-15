@@ -46,4 +46,28 @@ describe('Security and Validation', () => {
     const response = await request(app).get('/player/123-abc-456');
     expect(response.status).toBe(400);
   });
+
+  test('should reject excessively long ally code (DoS protection)', async () => {
+    const longAllyCode = '1'.repeat(1001);
+    const response = await request(app)
+      .post('/player-search')
+      .send(`allyCode=${longAllyCode}`);
+    // Currently this might not fail on length, but we want it to.
+    // If it's already failing because it's not 9 digits, that's fine,
+    // but we want to ensure we have a length check for defense in depth.
+    expect(response.status).toBe(400);
+  });
+
+  test('should reject large request bodies', async () => {
+    const largeBody = {
+      allyCode: '123456789',
+      padding: 'a'.repeat(2000)
+    };
+    const response = await request(app)
+      .post('/player-search')
+      .send(largeBody);
+    // Express default is often 100kb, we want to tighten it to 1kb.
+    // If it doesn't fail with 413 Payload Too Large, it means it's accepting too much.
+    expect(response.status).toBe(413);
+  });
 });

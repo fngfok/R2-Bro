@@ -23,6 +23,8 @@ app.use((req, res, next) => {
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
+  // Security: Enforce a reasonable maximum length to prevent processing excessively long strings (DoS)
+  if (allyCode.length > 20) return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
   const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
@@ -50,8 +52,10 @@ app.set('view cache', true);
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security: Limit body size to 1kb to prevent Denial of Service (DoS) via large payloads.
+// Using extended: false for urlencoded to avoid potential prototype pollution risks from 'qs' library.
+app.use(express.json({ limit: '1kb' }));
+app.use(express.urlencoded({ extended: false, limit: '1kb' }));
 
 // Routes
 app.get('/', (req, res) => {
