@@ -12,6 +12,10 @@
 **Learning:** Providing immediate visual feedback (e.g., disabling the button and changing its text to "Searching... 🤖") prevents multiple submissions and improves the perceived speed of the application.
 **Action:** Always implement a loading state for primary actions that involve external API calls or long-running processes.
 
+## 2025-05-23 - [Handling BFCache with Loading States]
+**Learning:** When implementing loading states that disable buttons on form submission, always listen for the `pageshow` event with `event.persisted` to re-enable the button if the user navigates back via the browser's BFCache. This prevents the button from being permanently stuck in a disabled state.
+**Action:** Include a `pageshow` listener to restore interactive states for components that are manually disabled during transitions.
+
 ## 2026-04-05 - SWGOH Ally Code UX Pattern
 **Learning:** For game-specific identifiers like SWGOH Ally Codes, users frequently use dashes or spaces for readability. The UI and backend should support these formats even if the core logic uses a raw 9-digit number.
 **Action:** Use `pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"` on the frontend and `replace(/[- ]/g, '')` on the backend for robust input handling.
