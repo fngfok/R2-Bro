@@ -28,6 +28,15 @@ describe('Security and Validation', () => {
     expect(response.status).toBe(400);
   });
 
+  test('should reject excessively long ally code (DoS prevention)', async () => {
+    const longAllyCode = '1'.repeat(21);
+    const response = await request(app)
+      .post('/player-search')
+      .send(`allyCode=${longAllyCode}`);
+    expect(response.status).toBe(400);
+    expect(response.text).toContain('Invalid Ally Code');
+  });
+
   test('should accept valid ally code with dashes or spaces', async () => {
     let response = await request(app)
       .post('/player-search')
