@@ -49,7 +49,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Set maxAge for static assets to 1 day to improve repeat-load performance via browser caching.
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
