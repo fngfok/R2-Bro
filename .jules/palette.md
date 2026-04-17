@@ -19,3 +19,7 @@
 ## 2026-04-05 - Sticky Footer and Flex Layout
 **Learning:** A fixed footer can overlap content on short pages or small screens. Using a Flexbox column layout on the body is a cleaner way to achieve a sticky footer that respects content flow.
 **Action:** Set `body { display: flex; flex-direction: column; min-height: 100vh; }` and `main { flex: 1; }`.
+
+## 2025-05-23 - [Consistent Focus Indicators with :focus-visible]
+**Learning:** Using :focus-visible instead of :focus allows for clear keyboard navigation indicators (using outline-offset for better visibility) without affecting the experience for mouse users, maintaining both accessibility and visual polish.
+**Action:** Apply `outline: 3px solid #3498db; outline-offset: 2px;` via `:focus-visible` to all interactive elements for a consistent, accessible focus pattern.
