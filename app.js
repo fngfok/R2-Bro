@@ -23,6 +23,8 @@ app.use((req, res, next) => {
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
+  // Optimization: Early exit for excessively long strings to prevent unnecessary processing
+  if (allyCode.length > 20) return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
   const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
@@ -49,9 +51,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Optimization: Enable browser caching for static assets to reduce server load and improve repeat load times.
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Optimization: use simple querystring parser (extended: false) for better performance with flat data
+app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.get('/', (req, res) => {
