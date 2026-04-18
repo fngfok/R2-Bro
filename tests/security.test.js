@@ -42,6 +42,14 @@ describe('Security and Validation', () => {
     expect(response.headers.location).toBe('/player/123456789');
   });
 
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+  });
+
   test('should reject invalid ally code in direct URL', async () => {
     const response = await request(app).get('/player/123-abc-456');
     expect(response.status).toBe(400);
