@@ -61,6 +61,11 @@ app.set('views', path.join(__dirname, 'views'));
 // and improved P95 latency by ~28% (4.26ms to 3.07ms).
 app.set('view cache', true);
 
+// Optimization: enable EJS view caching in production for faster rendering
+if (process.env.NODE_ENV === 'production') {
+  app.set('view cache', true);
+}
+
 // Static files
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
