@@ -26,3 +26,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-05 - Sticky Footer and Flex Layout
 **Learning:** A fixed footer can overlap content on short pages or small screens. Using a Flexbox column layout on the body is a cleaner way to achieve a sticky footer that respects content flow.
 **Action:** Set `body { display: flex; flex-direction: column; min-height: 100vh; }` and `main { flex: 1; }`.
+
+## 2026-04-10 - [Focus Rings and Border Radius]
+**Learning:** When interactive elements (buttons, links) have a `border-radius`, using a `box-shadow` (e.g., `box-shadow: 0 0 0 2px #3498db`) for `:focus-visible` provides a cleaner, more integrated visual focus indicator than a standard rectangular `outline`.
+**Action:** Use `box-shadow` for focus indicators on rounded elements to maintain visual consistency and accessibility.
