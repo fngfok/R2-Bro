@@ -85,4 +85,12 @@ describe('Security and Validation', () => {
     const response = await request(app).get('/player/123-abc-456');
     expect(response.status).toBe(400);
   });
+
+  test('should reject excessively long ally code', async () => {
+    const longAllyCode = '1'.repeat(21);
+    const response = await request(app)
+      .post('/player-search')
+      .send(`allyCode=${longAllyCode}`);
+    expect(response.status).toBe(400);
+  });
 });

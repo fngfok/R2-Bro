@@ -70,7 +70,7 @@ if (process.env.NODE_ENV === 'production') {
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: false, limit: '1kb' }));
 
 // Routes
 app.get('/', (req, res) => {
