@@ -16,20 +16,22 @@
     <main>
         <h2>Welcome to R2 Bro!</h2>
         <p>Your ultimate astromech companion for Star Wars: Galaxy of Heroes.</p>
-        <form action="/player-search" method="POST">
-            <label for="allyCode" class="sr-only">Enter Ally Code</label>
+        <form id="search-form" action="/player-search" method="POST">
+            <label for="allyCode">Enter Ally Code:</label>
             <input
+                id="allyCode"
+                class="search-input"
                 type="text"
                 id="allyCode"
                 name="allyCode"
-                placeholder="Enter Ally Code (e.g., 123-456-789)"
+                placeholder="123-456-789"
                 required
                 inputmode="numeric"
                 pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"
                 title="Ally code must be 9 digits"
                 aria-label="Enter Ally Code"
             >
-            <button type="submit">Search Player</button>
+            <button id="search-button" class="search-button" type="submit">Search Player</button>
         </form>
     </main>
     <footer>
