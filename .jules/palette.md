@@ -1,3 +1,6 @@
+## 2025-05-15 - Search UX and Accessibility Enhancements
+**Learning:** Adding a visible `<label>` is superior to just `aria-label` for accessibility as it provides a clear target for all users and works better with screen readers. Combining input flexibility (allowing spaces/dashes) with a backend sanitizer improves the user experience for copy-pasted content.
+**Action:** Always prefer semantic `<label>` elements for forms. Ensure backend validation mirrors frontend flexibility by sanitizing common separators like spaces and dashes.
 ## 2025-05-14 - Loading states and input tolerance
 
 **Learning:** Users often copy-paste ally codes from the game which might include spaces or dashes. The interface should be tolerant of these formats both on the frontend and backend. Additionally, providing immediate feedback via a "Searching..." state on the submit button prevents duplicate clicks and informs the user that the request is in progress.
