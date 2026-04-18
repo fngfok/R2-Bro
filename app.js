@@ -5,6 +5,8 @@ const path = require('path');
 const Player = require('./models/player');
 
 const app = express();
+// Disable X-Powered-By to reduce server fingerprinting and information leakage about the tech stack
+app.disable('x-powered-by');
 const port = process.env.PORT || 4200;
 
 // Security: Disable X-Powered-By header to avoid revealing framework information
