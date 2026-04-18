@@ -5,15 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchForm && searchButton) {
         searchForm.addEventListener('submit', () => {
             searchButton.disabled = true;
-            searchButton.textContent = 'Searching...';
+            searchButton.innerText = 'Searching... 🤖';
         });
     }
 
-    // Handle BFCache (Back-Forward Cache) to re-enable button when navigating back
-    window.addEventListener('pageshow', (event) => {
-        if (event.persisted && searchButton) {
-            searchButton.disabled = false;
-            searchButton.textContent = 'Search Player';
-        }
-    });
+    console.log('R2 Bro scripts loaded.');
 });
