@@ -4,20 +4,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (searchForm && searchButton) {
         searchForm.addEventListener('submit', () => {
-            searchButton.dataset.originalText = searchButton.textContent;
             searchButton.disabled = true;
-            searchButton.textContent = 'Searching...';
+            searchButton.innerText = 'Searching... 🤖';
         });
     }
-});
 
-// Re-enable button on page show (handles BFCache when navigating back)
-window.addEventListener('pageshow', (event) => {
-    if (event.persisted) {
-        const searchButton = document.getElementById('search-button');
-        if (searchButton && searchButton.dataset.originalText) {
-            searchButton.disabled = false;
-            searchButton.textContent = searchButton.dataset.originalText;
-        }
-    }
+    console.log('R2 Bro scripts loaded.');
 });
