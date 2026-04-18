@@ -5,8 +5,6 @@ const path = require('path');
 const Player = require('./models/player');
 
 const app = express();
-// Disable X-Powered-By to reduce server fingerprinting and information leakage about the tech stack
-app.disable('x-powered-by');
 const port = process.env.PORT || 4200;
 
 // Security: Disable X-Powered-By header to avoid revealing framework information
@@ -16,7 +14,8 @@ app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
+  res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
   next();
@@ -25,6 +24,8 @@ app.use((req, res, next) => {
 // Helper for ally code validation
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
+  // Security: Prevent DoS by rejecting excessively long strings before processing
+  if (allyCode.length > 20) return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
   const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
@@ -53,8 +54,9 @@ app.set('view cache', true);
 // Static files
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Security: Limit payload size to prevent DoS via large body content
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 
 // Routes
 app.get('/', (req, res) => {
