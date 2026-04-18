@@ -6,7 +6,7 @@ describe('Security and Validation', () => {
     const response = await request(app).get('/');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['x-frame-options']).toBe('DENY');
-    expect(response.headers['x-xss-protection']).toBe('1; mode=block');
+    expect(response.headers['x-xss-protection']).toBe('0');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
     expect(response.headers['x-powered-by']).toBeUndefined();
     expect(response.headers['content-security-policy']).toBeDefined();
