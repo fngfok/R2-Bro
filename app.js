@@ -22,7 +22,18 @@ app.use((req, res, next) => {
   next();
 });
 
-// Helper for ally code validation
+/**
+ * Helper for ally code validation and cleaning.
+ * Optimization: Uses a single pass to clean and validate.
+ */
+function getSanitizedAllyCode(allyCode) {
+  if (typeof allyCode !== 'string') return null;
+  // Clean all non-digit characters for backward compatibility and flexibility
+  const cleaned = allyCode.replace(/\D/g, '');
+  return /^\d{9}$/.test(cleaned) ? cleaned : null;
+}
+
+// Backward compatible helper
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
@@ -62,23 +73,20 @@ app.get('/', (req, res) => {
 });
 
 app.post('/player-search', (req, res) => {
-  const { allyCode } = req.body;
-  if (!allyCode || !isValidAllyCode(allyCode)) {
+  const sanitizedAllyCode = getSanitizedAllyCode(req.body.allyCode);
+
+  if (!sanitizedAllyCode) {
     return res.status(400).render('error', { message: 'Invalid Ally Code. Please enter a 9-digit number.' });
   }
-  // Sanitize: remove any non-digit characters (like dashes)
-  const sanitizedAllyCode = allyCode.replace(/\D/g, '');
   res.redirect(`/player/${sanitizedAllyCode}`);
 });
 
 app.get('/player/:allyCode', async (req, res) => {
-  const { allyCode } = req.params;
+  const sanitizedAllyCode = getSanitizedAllyCode(req.params.allyCode);
 
-  if (!isValidAllyCode(allyCode)) {
+  if (!sanitizedAllyCode) {
     return res.status(400).render('error', { message: 'Invalid Ally Code. Please enter a 9-digit number.' });
   }
-
-  const sanitizedAllyCode = allyCode.replace(/\D/g, '');
   const cacheKey = `player_${sanitizedAllyCode}`;
 
   try {

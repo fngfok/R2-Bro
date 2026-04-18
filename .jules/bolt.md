@@ -1,3 +1,6 @@
+## 2025-05-22 - Managing Lockfiles in Limited Environments
+**Learning:** Running `pnpm install` in this environment generates a `pnpm-lock.yaml` file with >3700 lines. Including this in a PR violates line-count constraints and pollutes the review.
+**Action:** Always delete `pnpm-lock.yaml` before submitting a PR unless explicit dependency changes are required and the lockfile is specifically requested.
 ## 2026-04-05 - Optimizing Express Defaults
 **Learning:** By default, Express reveals the server's fingerprint via the `X-Powered-By` header and does not cache EJS templates or static assets. Disabling `X-Powered-By` reduces byte-size and improves security. Explicitly enabling `view cache` ensures that template parsing only happens once, significantly improving render speed for frequently accessed pages. Setting a `maxAge` on static assets enables browser-side caching, dramatically reducing subsequent load times.
 **Action:** Always verify Express defaults for headers and caching. Use `app.disable('x-powered-by')`, `app.set('view cache', true)`, and `maxAge` in `express.static` for immediate performance wins.
