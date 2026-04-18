@@ -49,7 +49,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view cache', true);
 
 // Static files
-app.use(express.static(path.join(__dirname, 'public')));
+// Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
