@@ -40,15 +40,19 @@ class Player {
    * @returns {number} Total Galactic Power.
    */
   getGalacticPower() {
+    if (this._galacticPower !== undefined) {
+      return this._galacticPower;
+    }
+
     if (!this.profileStat || !Array.isArray(this.profileStat)) {
+      this._galacticPower = 0;
       return 0;
     }
     // Search for the stat with nameKey "Galactic Power" or use the known index (1)
-    // Most reliable is searching by nameKey "stat_power" or similar if known,
-    // but the issue description shows "nameKey": "string".
-    // We'll try to find it by nameKey if possible, otherwise fallback to index 1 or sum.
+    // Optimization: Memoize the result to avoid repeated O(n) searches in profileStat
     const gpStat = this.profileStat.find(stat => stat.nameKey === 'stat_power' || stat.index === 1);
-    return gpStat ? parseInt(gpStat.value, 10) : 0;
+    this._galacticPower = gpStat ? parseInt(gpStat.value, 10) : 0;
+    return this._galacticPower;
   }
 }
 
