@@ -1,1 +1,13 @@
-console.log('R2 Bro scripts loaded.');
+document.addEventListener('DOMContentLoaded', () => {
+    const searchForm = document.getElementById('search-form');
+    const searchButton = document.getElementById('search-button');
+
+    if (searchForm && searchButton) {
+        searchForm.addEventListener('submit', () => {
+            searchButton.disabled = true;
+            searchButton.innerText = 'Searching... 🤖';
+        });
+    }
+
+    console.log('R2 Bro scripts loaded.');
+});
