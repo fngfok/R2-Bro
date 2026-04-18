@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (searchForm && searchButton) {
         searchForm.addEventListener('submit', () => {
             searchButton.disabled = true;
-            searchButton.textContent = 'Searching...';
+            searchButton.innerText = 'Searching... 🤖';
         });
     }
-});
 
-console.log('R2 Bro scripts loaded.');
+    console.log('R2 Bro scripts loaded.');
+});
