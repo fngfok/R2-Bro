@@ -1,3 +1,24 @@
 ## 2025-05-14 - [Ally Code Input Flexibility and Feedback]
 **Learning:** Users often copy-paste ally codes from various sources that include dashes or spaces. Restricting input to only 9 digits creates friction. Providing a flexible pattern that allows common delimiters, paired with a visible label and immediate submission feedback, significantly improves the primary user journey.
 **Action:** Always allow flexible delimiters (dashes, spaces) in ID-like inputs and sanitize them on both frontend (pattern) and backend (regex replacement) before processing. Ensure a visible `<label>` is present for better cognitive accessibility, even if `aria-label` or `placeholder` are used.
+# 🎨 Palette's Journal
+
+## 2025-05-15 - [Immediate Feedback with Loading States]
+**Learning:** For asynchronous operations like player searches, users benefit significantly from immediate visual feedback. Disabling the submit button and changing its text to "Searching..." prevents duplicate submissions and confirms the action is being processed.
+**Action:** Always implement loading states for form submissions that involve network requests to improve responsiveness and prevent race conditions.
+
+## 2025-05-22 - [Refining CSS for Micro-UX]
+**Learning:** Avoid global tag styling (e.g., `button`, `input`) in `style.css` to prevent unintended side effects across the app. Use targeted classes instead.
+**Action:** When implementing a micro-UX improvement, define specific CSS classes (e.g., `.search-button`) and apply them only to the relevant elements in the template.
+
+## 2025-05-22 - [Loading State Feedback]
+**Learning:** Providing immediate visual feedback (e.g., disabling the button and changing its text to "Searching... 🤖") prevents multiple submissions and improves the perceived speed of the application.
+**Action:** Always implement a loading state for primary actions that involve external API calls or long-running processes.
+
+## 2026-04-05 - SWGOH Ally Code UX Pattern
+**Learning:** For game-specific identifiers like SWGOH Ally Codes, users frequently use dashes or spaces for readability. The UI and backend should support these formats even if the core logic uses a raw 9-digit number.
+**Action:** Use `pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"` on the frontend and `replace(/[- ]/g, '')` on the backend for robust input handling.
+
+## 2026-04-05 - Sticky Footer and Flex Layout
+**Learning:** A fixed footer can overlap content on short pages or small screens. Using a Flexbox column layout on the body is a cleaner way to achieve a sticky footer that respects content flow.
+**Action:** Set `body { display: flex; flex-direction: column; min-height: 100vh; }` and `main { flex: 1; }`.
