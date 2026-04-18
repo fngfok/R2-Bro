@@ -19,7 +19,11 @@
             <p><strong>Name:</strong> <%= player.name %></p>
             <p><strong>Ally Code:</strong> <%= player.allyCode %></p>
             <p><strong>Level:</strong> <%= player.level %></p>
-            <p><strong>GP:</strong> <%= (player.galacticPower / 1e6).toFixed(2) %>M</p>
+            <p><strong>GP:</strong> <%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</p>
+            <% const guildInfo = player.getGuildInfo(); %>
+            <% if (guildInfo.guildName) { %>
+                <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
+            <% } %>
         <% } else { %>
             <p>Player not found.</p>
         <% } %>
