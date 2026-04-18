@@ -3,7 +3,7 @@
 **Learning:** Even simple numeric inputs like SWGOH ally codes can be vectors for injection if not strictly validated against a regex pattern. Re-implementing app logic in tests was a mistake; refactoring `app.js` to export the `app` instance is the proper way to enable robust integration testing.
 **Prevention:** Always validate user input at the route level using strict regex. Implement standard security headers as a base layer of defense.
 
-## 2025-05-15 - [Strict CSP and Payload Limits]
-**Vulnerability:** Defense in depth against XSS and DoS.
-**Learning:** Implementing a strict `Content-Security-Policy` (`default-src 'self'`) in an EJS-based application requires careful verification of all templates to ensure no inline scripts or styles are used, as these would be blocked. Similarly, a very tight payload limit (e.g., 1KB) is excellent for simple search forms but must be communicated to the team to avoid breaking future features that require larger POST bodies.
-**Prevention:** Use automated frontend verification (e.g., Playwright) to check for CSP violations in the console after applying strict policies.
+## 2026-04-02 - [Payload Size Limits & Modernized Headers]
+**Vulnerability:** Default Express configurations for `json` and `urlencoded` parsers lack body size limits, exposing the application to Denial of Service (DoS) attacks via large payloads. Legacy `X-XSS-Protection` headers can sometimes be bypassed or even used to create vulnerabilities.
+**Learning:** Modernizing security headers involves moving away from legacy filters (setting `X-XSS-Protection: 0`) in favor of a strong `Content-Security-Policy`. Explicitly limiting payload sizes (e.g., `10kb`) is a simple but effective defense against memory-exhaustion DoS.
+**Prevention:** Always set explicit `limit` options on body parsers. Use CSP as the primary defense against XSS.
