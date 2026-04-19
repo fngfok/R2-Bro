@@ -11,22 +11,12 @@ header {
     color: white;
     padding: 10px;
 }
-
-nav a {
+header nav a {
     color: #ecf0f1;
     text-decoration: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    transition: background-color 0.2s;
 }
-
-nav a:hover, nav a:focus-visible {
-    background-color: #34495e;
-    outline: none;
-}
-
-nav a:focus-visible {
-    box-shadow: 0 0 0 2px #3498db;
+header nav a:hover {
+    text-decoration: underline;
 }
 main {
     background-color: white;
@@ -42,8 +32,9 @@ main {
     gap: 10px;
     max-width: 300px;
 }
-input[type="text"]:focus {
-    outline: 2px solid #3498db;
+:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
 }
 button {
     padding: 10px;
@@ -82,8 +73,15 @@ footer {
     opacity: 0.7;
 }
 
-.search-input:focus {
+.search-input:focus-visible {
     border-color: #3498db;
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-    outline: none;
+}
+
+/* Accessible focus states */
+a:focus-visible,
+button:focus-visible,
+.search-input:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
 }
