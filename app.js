@@ -36,6 +36,8 @@ function getSanitizedAllyCode(allyCode) {
 // Backward compatible helper
 function isValidAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return false;
+  // Defense-in-depth: limit input length to prevent processing excessively long strings
+  if (allyCode.length > 20) return false;
   // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
   const cleaned = allyCode.replace(/[- ]/g, '');
   return /^\d{9}$/.test(cleaned);
