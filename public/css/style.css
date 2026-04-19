@@ -11,13 +11,11 @@ header {
     color: white;
     padding: 10px;
 }
-nav a {
+header nav a {
     color: #ecf0f1;
     text-decoration: none;
-    padding: 2px 5px;
-    border-radius: 4px;
 }
-nav a:hover {
+header nav a:hover {
     text-decoration: underline;
 }
 main {
@@ -33,6 +31,10 @@ main {
     flex-direction: column;
     gap: 10px;
     max-width: 300px;
+}
+:focus-visible {
+    outline: 3px solid #3498db;
+    outline-offset: 2px;
 }
 button {
     padding: 10px;
@@ -74,7 +76,6 @@ footer {
 .search-input:focus {
     border-color: #3498db;
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
-    outline: none;
 }
 
 /* Accessible focus states */
