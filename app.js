@@ -5,8 +5,6 @@ const path = require('path');
 const Player = require('./models/player');
 
 const app = express();
-// Disable X-Powered-By to reduce server fingerprinting and information leakage about the tech stack
-app.disable('x-powered-by');
 const port = process.env.PORT || 4200;
 
 // Security: Disable X-Powered-By header to avoid revealing framework information
@@ -16,7 +14,8 @@ app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
+  // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
+  res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 ô  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
   next();

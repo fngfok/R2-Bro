@@ -7,3 +7,8 @@
 **Vulnerability:** Default Express configurations for `json` and `urlencoded` parsers lack body size limits, exposing the application to Denial of Service (DoS) attacks via large payloads. Legacy `X-XSS-Protection` headers can sometimes be bypassed or even used to create vulnerabilities.
 **Learning:** Modernizing security headers involves moving away from legacy filters (setting `X-XSS-Protection: 0`) in favor of a strong `Content-Security-Policy`. Explicitly limiting payload sizes (e.g., `10kb`) is a simple but effective defense against memory-exhaustion DoS.
 **Prevention:** Always set explicit `limit` options on body parsers. Use CSP as the primary defense against XSS.
+
+## 2026-04-03 - [Input Length Validation & Global Payload Limits]
+**Vulnerability:** Application was susceptible to DoS via excessively large request bodies or computationally expensive regex on extremely long input strings (e.g. 1MB "ally code").
+**Learning:** Defense-in-depth requires both application-level validation (length checks before regex) and infrastructure-level limits (express body-parser 'limit'). Modernizing security headers also means moving to `X-XSS-Protection: 0` when a strong CSP is present.
+**Prevention:** Always set explicit `limit` on body parsers and perform O(1) length checks on user input before running more complex validation logic.
