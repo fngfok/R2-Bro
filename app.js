@@ -17,7 +17,7 @@ app.use((req, res, next) => {
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-ô  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
   next();
 });
 

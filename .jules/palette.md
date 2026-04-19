@@ -45,3 +45,6 @@ This journal documents critical UX and accessibility learnings encountered durin
 **Learning:** A fixed footer can overlap content on short pages or small screens. Using a Flexbox column layout on the body is a cleaner way to achieve a sticky footer that respects content flow.
 **Action:** Set `body { display: flex; flex-direction: column; min-height: 100vh; }` and `main { flex: 1; }`.
 
+## 2026-04-10 - Copy-to-Clipboard Feedback Pattern
+**Learning:** Visual feedback for copy-to-clipboard actions (changing button text to "Copied!" and temporarily disabling the button) significantly improves user confidence and prevents redundant clicks.
+**Action:** Always provide immediate, temporary visual confirmation for clipboard actions to enhance the perceived responsiveness and reliability of the UI.
