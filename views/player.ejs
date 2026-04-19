@@ -17,7 +17,10 @@
         <h2>Player Profile</h2>
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
-            <p><strong>Ally Code:</strong> <%= player.allyCode %></p>
+            <p>
+                <strong>Ally Code:</strong> <span id="player-ally-code"><%= player.allyCode %></span>
+                <button id="copy-ally-code" class="search-button" style="padding: 2px 8px; font-size: 0.8em; margin-left: 10px;" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
+            </p>
             <p><strong>Level:</strong> <%= player.level %></p>
             <p><strong>GP:</strong> <%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</p>
             <% const guildInfo = player.getGuildInfo(); %>
