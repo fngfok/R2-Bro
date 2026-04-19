@@ -102,12 +102,13 @@ app.get('/player/:allyCode', async (req, res) => {
   const cacheKey = `player_${sanitizedAllyCode}`;
 
   try {
-    let playerData = cache.get(cacheKey);
-    if (!playerData) {
-      playerData = await comlink.getPlayer(sanitizedAllyCode);
-      cache.set(cacheKey, playerData);
+    // Optimization: Cache the Player instance instead of raw data to avoid repeated instantiation overhead
+    let player = cache.get(cacheKey);
+    if (!player) {
+      const playerData = await comlink.getPlayer(sanitizedAllyCode);
+      player = new Player(playerData);
+      cache.set(cacheKey, player);
     }
-    const player = new Player(playerData);
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
     console.error('Error fetching player data:', error);

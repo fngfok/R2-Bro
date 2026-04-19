@@ -14,3 +14,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-04-03 - [EJS Template Caching]
 **Learning:** Enabling `view cache` in Express for EJS templates provides a measurable performance boost by avoiding repeated disk reads and parsing of the same templates across requests. Even in small applications, this can reduce average response time and significantly improve P95 latency.
 **Action:** Always consider enabling template caching in production environments or when high performance is a priority. Use `app.set('view cache', true)` for Express applications.
+
+## 2026-04-18 - Instance Caching and Memoization
+**Learning:** Caching raw API data still incurs the cost of class instantiation and property assignment (Object.assign) on every request. Additionally, searching through large arrays (like SWGOH profileStats) repeatedly is inefficient.
+**Action:** Cache the fully instantiated Model objects instead of raw JSON. Implement memoization for expensive property lookups or calculations within the Model class to ensure O(1) access after the first call.
