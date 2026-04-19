@@ -17,7 +17,7 @@ app.use((req, res, next) => {
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-ô  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
   next();
 });
 
@@ -27,6 +27,8 @@ app.use((req, res, next) => {
  */
 function getSanitizedAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return null;
+  // Security: Fail fast if input is excessively long to prevent processing-based DoS
+  if (allyCode.length > 20) return null;
   // Clean all non-digit characters for backward compatibility and flexibility
   const cleaned = allyCode.replace(/\D/g, '');
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
