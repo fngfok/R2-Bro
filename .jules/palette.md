@@ -1,8 +1,17 @@
+
+## 2025-05-15 - Improving Form Submission UX with BFCache Support
+**Learning:** Disabling a submit button on form submission provides great immediate feedback but can break the UX if the user navigates back to the page via the browser's Back button. The browser's Back-Forward Cache (BFCache) might preserve the disabled state of the button.
+**Action:** Always pair button-disabling logic with a `pageshow` event listener that checks `event.persisted` to re-enable the button when the user returns to the page.
+
+## 2025-05-15 - Search UX and Accessibility Enhancements
+**Learning:** Adding a visible `<label>` is superior to just `aria-label` for accessibility as it provides a clear target for all users and works better with screen readers. Combining input flexibility (allowing spaces/dashes) with a backend sanitizer improves the user experience for copy-pasted content.
+**Action:** Always prefer semantic `<label>` elements for forms. Ensure backend validation mirrors frontend flexibility by sanitizing common separators like spaces and dashes.
 ## 2025-05-14 - Loading states and input tolerance
 
 **Learning:** Users often copy-paste ally codes from the game which might include spaces or dashes. The interface should be tolerant of these formats both on the frontend and backend. Additionally, providing immediate feedback via a "Searching..." state on the submit button prevents duplicate clicks and informs the user that the request is in progress.
 
 **Action:** Always ensure input fields for formatted numbers (like ally codes) are tolerant of common delimiters and provide immediate visual feedback for asynchronous operations.
+
 # 🎨 Palette's Journal - UX & Accessibility Learnings
 
 This journal documents critical UX and accessibility learnings encountered during the development of R2 Bro.
@@ -24,6 +33,10 @@ This journal documents critical UX and accessibility learnings encountered durin
 **Learning:** Providing immediate visual feedback (e.g., disabling the button and changing its text to "Searching... 🤖") prevents multiple submissions and improves the perceived speed of the application.
 **Action:** Always implement a loading state for primary actions that involve external API calls or long-running processes.
 
+## 2025-05-23 - [Handling BFCache with Loading States]
+**Learning:** When implementing loading states that disable buttons on form submission, always listen for the `pageshow` event with `event.persisted` to re-enable the button if the user navigates back via the browser's BFCache. This prevents the button from being permanently stuck in a disabled state.
+**Action:** Include a `pageshow` listener to restore interactive states for components that are manually disabled during transitions.
+
 ## 2026-04-05 - SWGOH Ally Code UX Pattern
 **Learning:** For game-specific identifiers like SWGOH Ally Codes, users frequently use dashes or spaces for readability. The UI and backend should support these formats even if the core logic uses a raw 9-digit number.
 **Action:** Use `pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"` on the frontend and `replace(/[- ]/g, '')` on the backend for robust input handling.
@@ -31,3 +44,4 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-05 - Sticky Footer and Flex Layout
 **Learning:** A fixed footer can overlap content on short pages or small screens. Using a Flexbox column layout on the body is a cleaner way to achieve a sticky footer that respects content flow.
 **Action:** Set `body { display: flex; flex-direction: column; min-height: 100vh; }` and `main { flex: 1; }`.
+
