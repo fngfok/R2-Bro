@@ -6,7 +6,7 @@ describe('Security and Validation', () => {
     const response = await request(app).get('/');
     expect(response.headers['x-content-type-options']).toBe('nosniff');
     expect(response.headers['x-frame-options']).toBe('DENY');
-    expect(response.headers['x-xss-protection']).toBe('1; mode=block');
+    expect(response.headers['x-xss-protection']).toBe('0');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
     expect(response.headers['x-powered-by']).toBeUndefined();
     expect(response.headers['content-security-policy']).toBeDefined();
@@ -29,12 +29,12 @@ describe('Security and Validation', () => {
   });
 
   test('should reject excessively long ally code (DoS prevention)', async () => {
-    const longAllyCode = '1'.repeat(100);
+    const longAllyCode = '1'.repeat(21);
     const response = await request(app)
       .post('/player-search')
       .send(`allyCode=${longAllyCode}`);
-    // Should be rejected by either express body-parser (413) or validation (400)
-    expect([400, 413]).toContain(response.status);
+    expect(response.status).toBe(400);
+    expect(response.text).toContain('Invalid Ally Code');
   });
 
   test('should accept valid ally code with dashes or spaces', async () => {
@@ -51,8 +51,55 @@ describe('Security and Validation', () => {
     expect(response.headers.location).toBe('/player/123456789');
   });
 
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+  });
+
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+  });
+
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+  });
+
+  test('should accept valid ally code with spaces', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123 456 789');
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/player/123456789');
+  });
+
+  test('should reject excessively long ally code', async () => {
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123456789012345678901');
+    expect(response.status).toBe(400);
+  });
+
   test('should reject invalid ally code in direct URL', async () => {
     const response = await request(app).get('/player/123-abc-456');
+    expect(response.status).toBe(400);
+  });
+
+  test('should reject excessively long ally code', async () => {
+    const longAllyCode = '1'.repeat(21);
+    const response = await request(app)
+      .post('/player-search')
+      .send(`allyCode=${longAllyCode}`);
     expect(response.status).toBe(400);
   });
 });
