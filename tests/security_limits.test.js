@@ -2,9 +2,9 @@ const request = require('supertest');
 const app = require('../app');
 
 describe('Security Limits', () => {
-  test('should reject a request body larger than 1kb', async () => {
-    // Creating a payload slightly larger than 1kb
-    const largePayload = 'a'.repeat(2 * 1024);
+  test('should reject a request body larger than 10kb', async () => {
+    // Creating a payload slightly larger than 10kb
+    const largePayload = 'a'.repeat(11 * 1024);
     const response = await request(app)
       .post('/player-search')
       .send(`allyCode=${largePayload}`);

@@ -73,6 +73,16 @@ footer {
     opacity: 0.7;
 }
 
+.required-marker {
+    color: #e74c3c;
+}
+
+#copy-ally-code {
+    padding: 2px 8px;
+    font-size: 0.8em;
+    margin-left: 10px;
+}
+
 .search-input:focus-visible {
     border-color: #3498db;
     box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);

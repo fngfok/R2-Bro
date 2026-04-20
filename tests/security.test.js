@@ -9,8 +9,14 @@ describe('Security and Validation', () => {
     expect(response.headers['x-xss-protection']).toBe('0');
     expect(response.headers['strict-transport-security']).toContain('max-age=31536000');
     expect(response.headers['x-powered-by']).toBeUndefined();
+    expect(response.headers['referrer-policy']).toBe('strict-origin-when-cross-origin');
+    expect(response.headers['permissions-policy']).toBe('camera=(), microphone=(), geolocation=()');
     expect(response.headers['content-security-policy']).toBeDefined();
     expect(response.headers['content-security-policy']).toContain("default-src 'self'");
+    expect(response.headers['content-security-policy']).toContain("style-src 'self'");
+    expect(response.headers['content-security-policy']).not.toContain("'unsafe-inline'");
+    expect(response.headers['content-security-policy']).toContain("base-uri 'self'");
+    expect(response.headers['content-security-policy']).toContain("form-action 'self'");
   });
 
   test('should reject invalid ally code in search', async () => {
