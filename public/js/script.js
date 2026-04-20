@@ -1,6 +1,24 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchForm = document.getElementById('search-form');
     const searchButton = document.getElementById('search-button');
+    const allyCodeInput = document.getElementById('allyCode');
+    const charCounter = document.getElementById('allyCode-counter');
+
+    if (allyCodeInput && charCounter) {
+        const updateCounter = () => {
+            const digits = allyCodeInput.value.replace(/\D/g, '').length;
+            charCounter.innerText = `${digits} / 9 digits`;
+            if (digits === 9) {
+                charCounter.classList.add('valid');
+            } else {
+                charCounter.classList.remove('valid');
+            }
+        };
+
+        allyCodeInput.addEventListener('input', updateCounter);
+        // Initialize on load in case of browser autofill
+        updateCounter();
+    }
 
     if (searchForm && searchButton) {
         searchForm.addEventListener('submit', () => {
