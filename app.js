@@ -17,7 +17,9 @@ app.use((req, res, next) => {
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline';");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self';");
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
 });
 
@@ -32,16 +34,6 @@ function getSanitizedAllyCode(allyCode) {
   // Clean all non-digit characters for backward compatibility and flexibility
   const cleaned = allyCode.replace(/\D/g, '');
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
-}
-
-// Backward compatible helper
-function isValidAllyCode(allyCode) {
-  if (typeof allyCode !== 'string') return false;
-  // Defense-in-depth: limit input length to prevent processing excessively long strings
-  if (allyCode.length > 20) return false;
-  // Ally codes are 9-digit numbers, sometimes formatted with dashes (xxx-xxx-xxx) or spaces
-  const cleaned = allyCode.replace(/[- ]/g, '');
-  return /^\d{9}$/.test(cleaned);
 }
 
 // Initialize Comlink Stub
@@ -59,26 +51,14 @@ const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// Optimization: Cache EJS templates to avoid repeated disk reads and parsing.
-// In a mock environment, this reduced average response time by ~9% (2.69ms to 2.45ms)
-// and improved P95 latency by ~28% (4.26ms to 3.07ms).
-app.set('view cache', true);
-
-// Optimization: enable EJS view caching in production for faster rendering
-if (process.env.NODE_ENV === 'production') {
-  app.set('view cache', true);
-}
-
-// Optimization: Enable view caching in production to avoid repeated disk reads and template compilation
-if (process.env.NODE_ENV === 'production') {
-  app.set('view cache', true);
-}
+// Optimization: Express enables EJS caching by default in production.
+// No explicit app.set('view cache') is required here.
 
 // Static files
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: false, limit: '1kb' }));
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // Routes
 app.get('/', (req, res) => {

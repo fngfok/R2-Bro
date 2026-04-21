@@ -12,3 +12,8 @@
 **Vulnerability:** Application was susceptible to DoS via excessively large request bodies or computationally expensive regex on extremely long input strings (e.g. 1MB "ally code").
 **Learning:** Defense-in-depth requires both application-level validation (length checks before regex) and infrastructure-level limits (express body-parser 'limit'). Modernizing security headers also means moving to `X-XSS-Protection: 0` when a strong CSP is present.
 **Prevention:** Always set explicit `limit` on body parsers and perform O(1) length checks on user input before running more complex validation logic.
+
+## 2025-05-15 - [Strict CSP and Inline Style Removal]
+**Vulnerability:** Use of `'unsafe-inline'` in `Content-Security-Policy` allowed for potential CSS-based injection or exploitation of style-based vulnerabilities.
+**Learning:** Moving all inline styles (including small markers like red asterisks) to external CSS classes is necessary to achieve a strict CSP without `'unsafe-inline'`. This requires careful auditing of all template files (EJS).
+**Prevention:** Enforce a strict CSP from the start and use CSS classes for all visual markers and dynamic styling.
