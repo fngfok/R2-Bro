@@ -29,7 +29,10 @@
                 inputmode="numeric"
                 pattern="[0-9]{3}[- ]?[0-9]{3}[- ]?[0-9]{3}"
                 title="Ally code must be 9 digits"
+                aria-describedby="allyCode-counter allyCode-hint"
             >
+            <div id="allyCode-counter" class="char-counter" aria-live="polite">0 / 9 digits</div>
+            <span id="allyCode-hint" class="sr-only">Enter your 9-digit ally code. Dashes and spaces are allowed but won't be counted.</span>
             <button id="search-button" class="search-button" type="submit">Search Player</button>
         </form>
     </main>

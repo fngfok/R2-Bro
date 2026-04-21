@@ -48,3 +48,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-10 - Copy-to-Clipboard Feedback Pattern
 **Learning:** Visual feedback for copy-to-clipboard actions (changing button text to "Copied!" and temporarily disabling the button) significantly improves user confidence and prevents redundant clicks.
 **Action:** Always provide immediate, temporary visual confirmation for clipboard actions to enhance the perceived responsiveness and reliability of the UI.
+
+## 2026-04-20 - Real-time Digit Counter for Specific-Length Identifiers
+**Learning:** For inputs requiring a specific number of digits (like 9-digit Ally Codes), a real-time counter that ignores non-digit separators (dashes/spaces) reduces cognitive load and input errors. Pairing this with `aria-describedby` and `aria-live="polite"` ensures the feedback is accessible to all users.
+**Action:** Use a regex-based counter (`.replace(/\D/g, '').length`) for formatted numeric inputs and provide a visual "valid" state when the target count is reached.
