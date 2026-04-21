@@ -13,11 +13,36 @@ describe('Player Class', () => {
       playerId: 'abc-123-def',
       rosterUnit: [
         {
-          id: 'unit_vader',
-          definitionId: 'VADER:VADER',
-          currentRarity: 7,
-          currentLevel: 85
-        }
+          "id": "XR0_QSYeTaSA86Bn9ewVRg",
+          "definitionId": "BISTAN:SEVEN_STAR",
+          "currentRarity": 7,
+          "currentLevel": 85,
+          "currentXp": 883025,
+          "promotionRecipeReference": "",
+          "unitStat": null,
+          "currentTier": 13,
+          "relic": {
+            "currentTier": 7
+          },
+          "skill": [
+            {
+              "id": "basicskill_BISTAN",
+              "tier": 6
+            },
+            {
+              "id": "specialskill_BISTAN01",
+              "tier": 6
+            },
+            {
+              "id": "specialskill_BISTAN02",
+              "tier": 6
+            },
+            {
+              "id": "uniqueskill_BISTAN01",
+              "tier": 5
+            }
+          ],
+        },
       ],
       profileStat: [
         { nameKey: 'stat_power', index: 1, value: 5000000 },
