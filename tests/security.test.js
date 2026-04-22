@@ -1,7 +1,12 @@
 const request = require('supertest');
-const app = require('../app');
 
 describe('Security and Validation', () => {
+  let app;
+  beforeEach(() => {
+    jest.resetModules();
+    app = require('../app');
+  });
+
   test('should have security headers', async () => {
     const response = await request(app).get('/');
     expect(response.headers['x-content-type-options']).toBe('nosniff');

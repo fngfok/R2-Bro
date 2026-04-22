@@ -17,3 +17,8 @@
 **Vulnerability:** Use of `'unsafe-inline'` in `Content-Security-Policy` allowed for potential CSS-based injection or exploitation of style-based vulnerabilities.
 **Learning:** Moving all inline styles (including small markers like red asterisks) to external CSS classes is necessary to achieve a strict CSP without `'unsafe-inline'`. This requires careful auditing of all template files (EJS).
 **Prevention:** Enforce a strict CSP from the start and use CSS classes for all visual markers and dynamic styling.
+
+## 2025-05-16 - [Rate Limiting & Trust Proxy Configuration]
+**Vulnerability:** Lack of rate limiting on sensitive search and profile routes exposed the application to brute-force and Denial of Service (DoS) attacks.
+**Learning:** Implementing IP-based rate limiting in Express requires explicit configuration of `app.set('trust proxy', 1)` when deployed behind a proxy or load balancer. Without this, the rate limiter would incorrectly track the proxy's IP, potentially blocking all legitimate traffic. Additionally, keeping dependency versions stable and realistic is crucial for maintainable security.
+**Prevention:** Always apply rate limiting to routes that perform expensive operations or handle user input. Ensure `trust proxy` is correctly set based on the deployment environment to accurately identify client IPs.
