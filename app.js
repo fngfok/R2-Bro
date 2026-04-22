@@ -36,6 +36,9 @@ function getSanitizedAllyCode(allyCode) {
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
 }
 
+// Optimization: Map to track pending requests and prevent thundering herd
+const pendingRequests = new Map();
+
 // Initialize Comlink Stub
 const comlink = new ComlinkStub({
   url: process.env.COMLINK_URL || 'http://localhost:3000',
@@ -86,9 +89,23 @@ app.get('/player/:allyCode', async (req, res) => {
     // Optimization: Cache the Player instance instead of raw data to avoid repeated instantiation overhead
     let player = cache.get(cacheKey);
     if (!player) {
-      const playerData = await comlink.getPlayer(sanitizedAllyCode);
-      player = new Player(playerData);
-      cache.set(cacheKey, player);
+      // Optimization: Concurrent Request Coalescing
+      if (pendingRequests.has(cacheKey)) {
+        player = await pendingRequests.get(cacheKey);
+      } else {
+        const requestPromise = (async () => {
+          try {
+            const playerData = await comlink.getPlayer(sanitizedAllyCode);
+            const newPlayer = new Player(playerData);
+            cache.set(cacheKey, newPlayer);
+            return newPlayer;
+          } finally {
+            pendingRequests.delete(cacheKey);
+          }
+        })();
+        pendingRequests.set(cacheKey, requestPromise);
+        player = await requestPromise;
+      }
     }
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
