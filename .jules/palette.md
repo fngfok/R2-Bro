@@ -52,3 +52,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-20 - Real-time Digit Counter for Specific-Length Identifiers
 **Learning:** For inputs requiring a specific number of digits (like 9-digit Ally Codes), a real-time counter that ignores non-digit separators (dashes/spaces) reduces cognitive load and input errors. Pairing this with `aria-describedby` and `aria-live="polite"` ensures the feedback is accessible to all users.
 **Action:** Use a regex-based counter (`.replace(/\D/g, '').length`) for formatted numeric inputs and provide a visual "valid" state when the target count is reached.
+
+## 2026-04-25 - Data Transparency with Progressive Detail
+**Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
+**Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.

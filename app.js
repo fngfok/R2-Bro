@@ -59,11 +59,6 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
-/**
- * Optimization: Coalesce concurrent requests for the same ally code to prevent cache stampedes.
- * This map stores pending promises for active API lookups.
- */
-const pendingRequests = new Map();
 
 /**
  * Simple Rate Limiting Middleware using node-cache
