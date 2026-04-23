@@ -7,13 +7,14 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header>
         <h1>🤖 R2 Bro</h1>
         <nav>
             <a href="/">Home</a>
         </nav>
     </header>
-    <main>
+    <main id="main-content">
         <h2>Player Profile</h2>
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
