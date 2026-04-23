@@ -48,6 +48,24 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+/**
+ * Simple Rate Limiting Middleware using node-cache
+ * Security: Prevents DoS and automated scraping of player data.
+ * Limit: 10 requests per 10 seconds per IP.
+ */
+const rateLimitCache = new NodeCache({ stdTTL: 10, checkperiod: 120 });
+const rateLimiter = (req, res, next) => {
+  const ip = req.ip;
+  const count = rateLimitCache.get(ip) || 0;
+
+  if (count >= 10) {
+    return res.status(429).render('error', { message: 'Too many requests. Please try again in a few seconds.' });
+  }
+
+  rateLimitCache.set(ip, count + 1);
+  next();
+};
+
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -65,7 +83,7 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'R2 Bro - Home' });
 });
 
-app.post('/player-search', (req, res) => {
+app.post('/player-search', rateLimiter, (req, res) => {
   const sanitizedAllyCode = getSanitizedAllyCode(req.body.allyCode);
 
   if (!sanitizedAllyCode) {
@@ -74,7 +92,7 @@ app.post('/player-search', (req, res) => {
   res.redirect(`/player/${sanitizedAllyCode}`);
 });
 
-app.get('/player/:allyCode', async (req, res) => {
+app.get('/player/:allyCode', rateLimiter, async (req, res) => {
   const sanitizedAllyCode = getSanitizedAllyCode(req.params.allyCode);
 
   if (!sanitizedAllyCode) {
