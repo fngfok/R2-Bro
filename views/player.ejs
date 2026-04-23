@@ -7,19 +7,27 @@
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <header>
         <h1>🤖 R2 Bro</h1>
         <nav>
             <a href="/">Home</a>
         </nav>
     </header>
-    <main>
+    <main id="main-content">
         <h2>Player Profile</h2>
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
-            <p><strong>Ally Code:</strong> <%= player.allyCode %></p>
+            <p>
+                <strong>Ally Code:</strong> <span id="player-ally-code"><%= player.allyCode %></span>
+                <button id="copy-ally-code" class="search-button" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
+            </p>
             <p><strong>Level:</strong> <%= player.level %></p>
-            <p><strong>GP:</strong> <%= (player.galacticPower / 1e6).toFixed(2) %>M</p>
+            <p><strong>GP:</strong> <%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</p>
+            <% const guildInfo = player.getGuildInfo(); %>
+            <% if (guildInfo.guildName) { %>
+                <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
+            <% } %>
         <% } else { %>
             <p>Player not found.</p>
         <% } %>
