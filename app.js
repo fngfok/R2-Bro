@@ -36,6 +36,9 @@ function getSanitizedAllyCode(allyCode) {
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
 }
 
+// Optimization: Map to track pending requests and prevent thundering herd
+const pendingRequests = new Map();
+
 // Initialize Comlink Stub
 const comlink = new ComlinkStub({
   url: process.env.COMLINK_URL || 'http://localhost:3000',
