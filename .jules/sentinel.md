@@ -22,3 +22,8 @@
 **Vulnerability:** Lack of rate limiting on sensitive search and profile routes exposed the application to brute-force and Denial of Service (DoS) attacks.
 **Learning:** Implementing IP-based rate limiting in Express requires explicit configuration of `app.set('trust proxy', 1)` when deployed behind a proxy or load balancer. Without this, the rate limiter would incorrectly track the proxy's IP, potentially blocking all legitimate traffic. Additionally, keeping dependency versions stable and realistic is crucial for maintainable security.
 **Prevention:** Always apply rate limiting to routes that perform expensive operations or handle user input. Ensure `trust proxy` is correctly set based on the deployment environment to accurately identify client IPs.
+
+## 2025-05-16 - [In-Memory Rate Limiting & Test Isolation]
+**Vulnerability:** Lack of rate limiting on search endpoints exposed the application to automated scraping and resource exhaustion (DoS).
+**Learning:** Implementing in-memory rate limiting with `node-cache` is effective for small apps, but requires careful test isolation. Standard Jest tests share the same process, so the in-memory cache persists across tests, causing subsequent tests to fail with 429 errors.
+**Prevention:** Use `jest.resetModules()` in `beforeEach` to ensure a fresh application instance and cache for every test case.

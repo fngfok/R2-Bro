@@ -51,14 +51,26 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
-// Rate limiting middleware: 10 requests per 10 seconds per IP
+/**
+ * Optimization: Coalesce concurrent requests for the same ally code to prevent cache stampedes.
+ * This map stores pending promises for active API lookups.
+ */
+const pendingRequests = new Map();
+
+/**
+ * Simple Rate Limiting Middleware using node-cache
+ * Security: Prevents DoS and automated scraping of player data.
+ * Limit: 10 requests per 10 seconds per IP.
+ */
 const rateLimitCache = new NodeCache({ stdTTL: 10, checkperiod: 2 });
 const rateLimiter = (req, res, next) => {
   const ip = req.ip;
   const count = rateLimitCache.get(ip) || 0;
+
   if (count >= 10) {
     return res.status(429).render('error', { message: 'Too many requests. Please try again later.' });
   }
+
   const ttl = rateLimitCache.getTtl(ip);
   const remainingTTL = ttl ? (ttl - Date.now()) / 1000 : 10;
   rateLimitCache.set(ip, count + 1, remainingTTL);
@@ -102,11 +114,28 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
   try {
     // Optimization: Cache the Player instance instead of raw data to avoid repeated instantiation overhead
     let player = cache.get(cacheKey);
+
     if (!player) {
-      const playerData = await comlink.getPlayer(sanitizedAllyCode);
-      player = new Player(playerData);
-      cache.set(cacheKey, player);
+      // Check if there is already a pending request for this ally code to coalesce concurrent calls
+      if (pendingRequests.has(sanitizedAllyCode)) {
+        player = await pendingRequests.get(sanitizedAllyCode);
+      } else {
+        const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
+          .then(playerData => {
+            const newPlayer = new Player(playerData);
+            cache.set(cacheKey, newPlayer);
+            return newPlayer;
+          })
+          .finally(() => {
+            // Ensure the promise is removed from the map regardless of success or failure
+            pendingRequests.delete(sanitizedAllyCode);
+          });
+
+        pendingRequests.set(sanitizedAllyCode, fetchPromise);
+        player = await fetchPromise;
+      }
     }
+
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
     console.error('Error fetching player data:', error);

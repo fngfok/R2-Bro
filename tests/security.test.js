@@ -55,31 +55,10 @@ describe('Security and Validation', () => {
     expect(response.status).toBe(302);
     expect(response.headers.location).toBe('/player/123456789');
 
-    response = await request(app)
-      .post('/player-search')
-      .send('allyCode=123 456 789');
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe('/player/123456789');
-  });
-
-  test('should accept valid ally code with spaces', async () => {
-    const response = await request(app)
-      .post('/player-search')
-      .send('allyCode=123 456 789');
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe('/player/123456789');
-  });
-
-  test('should accept valid ally code with spaces', async () => {
-    const response = await request(app)
-      .post('/player-search')
-      .send('allyCode=123 456 789');
-    expect(response.status).toBe(302);
-    expect(response.headers.location).toBe('/player/123456789');
-  });
-
-  test('should accept valid ally code with spaces', async () => {
-    const response = await request(app)
+    // Resetting app for next check in same test to avoid rate limit
+    jest.resetModules();
+    const app2 = require('../app');
+    response = await request(app2)
       .post('/player-search')
       .send('allyCode=123 456 789');
     expect(response.status).toBe(302);
@@ -106,11 +85,28 @@ describe('Security and Validation', () => {
     expect(response.status).toBe(400);
   });
 
-  test('should reject excessively long ally code', async () => {
+  test('should reject excessively long ally code again', async () => {
     const longAllyCode = '1'.repeat(21);
     const response = await request(app)
       .post('/player-search')
       .send(`allyCode=${longAllyCode}`);
     expect(response.status).toBe(400);
+  });
+
+  test('should rate limit requests', async () => {
+    // Make 10 requests (the limit)
+    for (let i = 0; i < 10; i++) {
+      await request(app)
+        .post('/player-search')
+        .send('allyCode=123456789');
+    }
+
+    // The 11th request should be rate limited
+    const response = await request(app)
+      .post('/player-search')
+      .send('allyCode=123456789');
+
+    expect(response.status).toBe(429);
+    expect(response.text).toContain('Too many requests');
   });
 });
