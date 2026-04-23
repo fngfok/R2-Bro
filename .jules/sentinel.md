@@ -22,3 +22,8 @@
 **Vulnerability:** Lack of rate limiting on search endpoints exposed the application to automated scraping and resource exhaustion (DoS).
 **Learning:** Implementing in-memory rate limiting with `node-cache` is effective for small apps, but requires careful test isolation. Standard Jest tests share the same process, so the in-memory cache persists across tests, causing subsequent tests to fail with 429 errors.
 **Prevention:** Use `jest.resetModules()` in `beforeEach` to ensure a fresh application instance and cache for every test case.
+
+## 2025-05-17 - [Proxy Trust & Strict Rate Limit Windows]
+**Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
+**Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
+**Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.

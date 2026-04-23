@@ -9,6 +9,8 @@ const port = process.env.PORT || 4200;
 
 // Security: Disable X-Powered-By header to avoid revealing framework information
 app.disable('x-powered-by');
+// Security: Trust proxy for accurate IP-based rate limiting when behind a load balancer
+app.set('trust proxy', 1);
 
 // Security Middleware
 app.use((req, res, next) => {
@@ -35,9 +37,6 @@ function getSanitizedAllyCode(allyCode) {
   const cleaned = allyCode.replace(/\D/g, '');
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
 }
-
-// Optimization: Map to track pending requests and prevent thundering herd
-const pendingRequests = new Map();
 
 // Initialize Comlink Stub
 const comlink = new ComlinkStub({
@@ -71,7 +70,10 @@ const rateLimiter = (req, res, next) => {
     return res.status(429).render('error', { message: 'Too many requests. Please try again in a few seconds.' });
   }
 
-  rateLimitCache.set(ip, count + 1);
+  // Security Enhancement: Preserve remaining TTL to maintain a strict sliding window
+  const ttl = rateLimitCache.getTtl(ip);
+  const remainingSeconds = ttl ? Math.max(0, (ttl - Date.now()) / 1000) : 10;
+  rateLimitCache.set(ip, count + 1, remainingSeconds);
   next();
 };
 
