@@ -25,17 +25,26 @@ app.use((req, res, next) => {
   next();
 });
 
+// Optimization: Regexes hoisted for performance
+const ALLY_CODE_CLEAN_REGEX = /\D/g;
+const ALLY_CODE_VALIDATE_REGEX = /^\d{9}$/;
+
 /**
  * Helper for ally code validation and cleaning.
  * Optimization: Uses a single pass to clean and validate.
+ * Optimization: Hoisted regexes and fast-path for already cleaned codes.
  */
 function getSanitizedAllyCode(allyCode) {
   if (typeof allyCode !== 'string') return null;
   // Security: Fail fast if input is excessively long to prevent processing-based DoS
   if (allyCode.length > 20) return null;
+
+  // Optimization: Fast-path for already cleaned 9-digit ally codes
+  if (ALLY_CODE_VALIDATE_REGEX.test(allyCode)) return allyCode;
+
   // Clean all non-digit characters for backward compatibility and flexibility
-  const cleaned = allyCode.replace(/\D/g, '');
-  return /^\d{9}$/.test(cleaned) ? cleaned : null;
+  const cleaned = allyCode.replace(ALLY_CODE_CLEAN_REGEX, '');
+  return ALLY_CODE_VALIDATE_REGEX.test(cleaned) ? cleaned : null;
 }
 
 // Initialize Comlink Stub
@@ -80,8 +89,8 @@ const rateLimiter = (req, res, next) => {
 // View engine setup
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-// Optimization: Express enables EJS caching by default in production.
-// No explicit app.set('view cache') is required here.
+// Optimization: Enable view caching to avoid repeated template parsing
+app.set('view cache', true);
 
 // Static files
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
