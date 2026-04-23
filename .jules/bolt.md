@@ -18,3 +18,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-04-18 - Instance Caching and Memoization
 **Learning:** Caching raw API data still incurs the cost of class instantiation and property assignment (Object.assign) on every request. Additionally, searching through large arrays (like SWGOH profileStats) repeatedly is inefficient.
 **Action:** Cache the fully instantiated Model objects instead of raw JSON. Implement memoization for expensive property lookups or calculations within the Model class to ensure O(1) access after the first call.
+
+## 2026-05-10 - Concurrent Request Coalescing
+**Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
+**Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.

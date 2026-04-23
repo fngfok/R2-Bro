@@ -36,6 +36,9 @@ function getSanitizedAllyCode(allyCode) {
   return /^\d{9}$/.test(cleaned) ? cleaned : null;
 }
 
+// Optimization: Map to track pending requests and prevent thundering herd
+const pendingRequests = new Map();
+
 // Initialize Comlink Stub
 const comlink = new ComlinkStub({
   url: process.env.COMLINK_URL || 'http://localhost:3000',
@@ -47,6 +50,30 @@ const comlink = new ComlinkStub({
 // Cache initialization (TTL: 1 hour)
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
+
+/**
+ * Optimization: Coalesce concurrent requests for the same ally code to prevent cache stampedes.
+ * This map stores pending promises for active API lookups.
+ */
+const pendingRequests = new Map();
+
+/**
+ * Simple Rate Limiting Middleware using node-cache
+ * Security: Prevents DoS and automated scraping of player data.
+ * Limit: 10 requests per 10 seconds per IP.
+ */
+const rateLimitCache = new NodeCache({ stdTTL: 10, checkperiod: 120 });
+const rateLimiter = (req, res, next) => {
+  const ip = req.ip;
+  const count = rateLimitCache.get(ip) || 0;
+
+  if (count >= 10) {
+    return res.status(429).render('error', { message: 'Too many requests. Please try again in a few seconds.' });
+  }
+
+  rateLimitCache.set(ip, count + 1);
+  next();
+};
 
 // View engine setup
 app.set('view engine', 'ejs');
@@ -65,7 +92,7 @@ app.get('/', (req, res) => {
   res.render('index', { title: 'R2 Bro - Home' });
 });
 
-app.post('/player-search', (req, res) => {
+app.post('/player-search', rateLimiter, (req, res) => {
   const sanitizedAllyCode = getSanitizedAllyCode(req.body.allyCode);
 
   if (!sanitizedAllyCode) {
@@ -74,7 +101,7 @@ app.post('/player-search', (req, res) => {
   res.redirect(`/player/${sanitizedAllyCode}`);
 });
 
-app.get('/player/:allyCode', async (req, res) => {
+app.get('/player/:allyCode', rateLimiter, async (req, res) => {
   const sanitizedAllyCode = getSanitizedAllyCode(req.params.allyCode);
 
   if (!sanitizedAllyCode) {
@@ -85,11 +112,28 @@ app.get('/player/:allyCode', async (req, res) => {
   try {
     // Optimization: Cache the Player instance instead of raw data to avoid repeated instantiation overhead
     let player = cache.get(cacheKey);
+
     if (!player) {
-      const playerData = await comlink.getPlayer(sanitizedAllyCode);
-      player = new Player(playerData);
-      cache.set(cacheKey, player);
+      // Check if there is already a pending request for this ally code to coalesce concurrent calls
+      if (pendingRequests.has(sanitizedAllyCode)) {
+        player = await pendingRequests.get(sanitizedAllyCode);
+      } else {
+        const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
+          .then(playerData => {
+            const newPlayer = new Player(playerData);
+            cache.set(cacheKey, newPlayer);
+            return newPlayer;
+          })
+          .finally(() => {
+            // Ensure the promise is removed from the map regardless of success or failure
+            pendingRequests.delete(sanitizedAllyCode);
+          });
+
+        pendingRequests.set(sanitizedAllyCode, fetchPromise);
+        player = await fetchPromise;
+      }
     }
+
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
     console.error('Error fetching player data:', error);

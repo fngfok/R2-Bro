@@ -17,3 +17,8 @@
 **Vulnerability:** Use of `'unsafe-inline'` in `Content-Security-Policy` allowed for potential CSS-based injection or exploitation of style-based vulnerabilities.
 **Learning:** Moving all inline styles (including small markers like red asterisks) to external CSS classes is necessary to achieve a strict CSP without `'unsafe-inline'`. This requires careful auditing of all template files (EJS).
 **Prevention:** Enforce a strict CSP from the start and use CSS classes for all visual markers and dynamic styling.
+
+## 2025-05-16 - [In-Memory Rate Limiting & Test Isolation]
+**Vulnerability:** Lack of rate limiting on search endpoints exposed the application to automated scraping and resource exhaustion (DoS).
+**Learning:** Implementing in-memory rate limiting with `node-cache` is effective for small apps, but requires careful test isolation. Standard Jest tests share the same process, so the in-memory cache persists across tests, causing subsequent tests to fail with 429 errors.
+**Prevention:** Use `jest.resetModules()` in `beforeEach` to ensure a fresh application instance and cache for every test case.
