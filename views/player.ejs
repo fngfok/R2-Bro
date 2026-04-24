@@ -28,14 +28,14 @@
             <% if (guildInfo.guildName) { %>
                 <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
             <% } %>
-            <div style="margin-top: 20px;">
+            <p class="search-actions">
                 <a href="/" class="search-button">Search Another Player</a>
-            </div>
+            </p>
         <% } else { %>
             <p>Player not found.</p>
-            <div style="margin-top: 20px;">
+            <p class="search-actions">
                 <a href="/" class="search-button">Back to Search</a>
-            </div>
+            </p>
         <% } %>
     </main>
     <footer>

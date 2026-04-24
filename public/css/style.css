@@ -135,6 +135,10 @@ footer {
     top: 0;
 }
 
+.search-actions {
+    margin-top: 20px;
+}
+
 /* Accessible focus states */
 a:focus-visible,
 button:focus-visible,
