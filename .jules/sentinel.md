@@ -27,3 +27,13 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2026-04-24 - [Regression in Request Coalescing]
+**Vulnerability:** A missing module-level declaration of `pendingRequests` caused the application to crash on concurrent requests, effectively bypassing the "thundering herd" DoS protection.
+**Learning:** Security features implemented via stateful objects (like Maps for coalescing) are fragile during refactoring. If the state container is removed but the logic remains, it leads to runtime crashes (`ReferenceError`).
+**Prevention:** Always verify security logic with concurrency tests (like `tests/coalesce.test.js`) after refactoring core route handlers.
+
+## 2026-04-24 - [Strict CSP Enforcement & Inline Styles]
+**Vulnerability:** Presence of inline `style` attributes in templates violated the `Content-Security-Policy` which prohibits `'unsafe-inline'`.
+**Learning:** Achieving a truly strict CSP requires moving even trivial layout styles (like `margin-top`) to external CSS classes. This is a recurring pattern in this codebase where micro-UX improvements often conflict with the baseline security posture.
+**Prevention:** Audit all EJS templates for `style=` attributes and migrate them to `public/css/style.css`.
