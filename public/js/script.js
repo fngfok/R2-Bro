@@ -43,12 +43,25 @@ document.addEventListener('DOMContentLoaded', () => {
     if (copyButton && allyCodeSpan) {
         copyButton.addEventListener('click', async () => {
             try {
-                await navigator.clipboard.writeText(allyCodeSpan.innerText);
+                const textToCopy = allyCodeSpan.dataset.rawAllyCode || allyCodeSpan.innerText;
+                await navigator.clipboard.writeText(textToCopy);
                 const originalText = copyButton.innerText;
+                const originalTitle = copyButton.title;
+                const originalAriaLabel = copyButton.getAttribute('aria-label');
+
                 copyButton.innerText = 'Copied! ✅';
+                copyButton.title = 'Copied!';
+                copyButton.setAttribute('aria-label', 'Copied!');
                 copyButton.disabled = true;
+
                 setTimeout(() => {
                     copyButton.innerText = originalText;
+                    copyButton.title = originalTitle;
+                    if (originalAriaLabel) {
+                        copyButton.setAttribute('aria-label', originalAriaLabel);
+                    } else {
+                        copyButton.removeAttribute('aria-label');
+                    }
                     copyButton.disabled = false;
                 }, 2000);
             } catch (err) {

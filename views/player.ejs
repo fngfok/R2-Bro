@@ -19,7 +19,7 @@
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
             <p>
-                <strong>Ally Code:</strong> <span id="player-ally-code"><%= player.allyCode %></span>
+                <strong>Ally Code:</strong> <span id="player-ally-code" data-raw-ally-code="<%= player.allyCode %>"><%= String(player.allyCode).slice(0, 3) %>-<%= String(player.allyCode).slice(3, 6) %>-<%= String(player.allyCode).slice(6) %></span>
                 <button id="copy-ally-code" class="search-button" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
             </p>
             <p><strong>Level:</strong> <%= player.level %></p>

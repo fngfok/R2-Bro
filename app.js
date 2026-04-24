@@ -29,6 +29,9 @@ app.use((req, res, next) => {
 const ALLY_CODE_CLEAN_REGEX = /\D/g;
 const ALLY_CODE_VALIDATE_REGEX = /^\d{9}$/;
 
+// Optimization: Map to track and coalesce concurrent requests for the same ally code
+const pendingRequests = new Map();
+
 /**
  * Helper for ally code validation and cleaning.
  * Optimization: Uses a single pass to clean and validate.
