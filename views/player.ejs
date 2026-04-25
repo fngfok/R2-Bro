@@ -19,7 +19,11 @@
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
             <p>
-                <strong>Ally Code:</strong> <span id="player-ally-code"><%= player.allyCode %></span>
+                <strong>Ally Code:</strong>
+                <% const rawAllyCode = String(player.allyCode); %>
+                <span id="player-ally-code" data-raw-ally-code="<%= rawAllyCode %>">
+                    <%= rawAllyCode.replace(/(\d{3})(\d{3})(\d{3})/, '$1-$2-$3') %>
+                </span>
                 <button id="copy-ally-code" class="search-button" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
             </p>
             <p><strong>Level:</strong> <%= player.level %></p>
@@ -28,12 +32,12 @@
             <% if (guildInfo.guildName) { %>
                 <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
             <% } %>
-            <div style="margin-top: 20px;">
+            <div class="search-actions">
                 <a href="/" class="search-button">Search Another Player</a>
             </div>
         <% } else { %>
             <p>Player not found.</p>
-            <div style="margin-top: 20px;">
+            <div class="search-actions">
                 <a href="/" class="search-button">Back to Search</a>
             </div>
         <% } %>

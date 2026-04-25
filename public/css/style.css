@@ -41,6 +41,10 @@ main {
     outline: 3px solid #3498db;
     outline-offset: 2px;
 }
+
+.search-actions {
+    margin-top: 20px;
+}
 button {
     padding: 10px;
     background-color: #3498db;
