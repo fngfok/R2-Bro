@@ -59,6 +59,10 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization: Map to track pending requests and coalesce concurrent calls for the same resource
+// Security: Prevents thundering herd DoS by ensuring only one upstream request per resource
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,7 +124,8 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
+      // Security: Coalesce concurrent requests for the same ally code to prevent 'thundering herd' DoS.
+      // This ensures only one upstream API call is made if multiple users request the same profile simultaneously.
       if (pendingRequests.has(sanitizedAllyCode)) {
         player = await pendingRequests.get(sanitizedAllyCode);
       } else {
