@@ -56,3 +56,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2025-05-23 - [Handling formatted identifiers in UI vs. logic]
+**Learning:** For game-specific identifiers like SWGOH Ally Codes, users find the formatted version (`XXX-XXX-XXX`) much easier to read. However, keeping a `data-raw-ally-code` attribute allows the "Copy" functionality to provide the clean 9-digit string that external tools often expect, providing the best of both worlds.
+**Action:** Always format identifiers for human readability in the UI but preserve a "raw" version in data attributes for functional interactions like copying.
