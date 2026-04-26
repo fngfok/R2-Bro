@@ -22,3 +22,11 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-05-15 - Lockfile Integrity and Environment Constraints
+**Learning:** In projects with strict line-count constraints for PRs, the `pnpm-lock.yaml` can often exceed the limit. However, deleting it is a major regression that breaks build reproducibility.
+**Action:** Always maintain the lockfile. If it is too large, consider atomic changes that don't trigger massive lockfile updates, or discuss the constraint with the team instead of deleting critical infrastructure.
+
+## 2026-05-15 - Redundant Logic vs. Optimization
+**Learning:** Refactoring existing performance logic is good for readability but might not count as a new optimization if the bottleneck was already addressed.
+**Action:** Always check if an optimization pattern is already partially or fully implemented before starting. Focus on unaddressed bottlenecks like memoization of frequently accessed model properties.

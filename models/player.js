@@ -25,13 +25,17 @@ class Player {
 
   /**
    * Returns basic guild information.
+   * Optimization: Memoize the guild info object to avoid redundant object creation.
    * @returns {Object} Object containing guildId and guildName.
    */
   getGuildInfo() {
-    return {
+    if (this._guildInfo) return this._guildInfo;
+
+    this._guildInfo = {
       guildId: this.guildId || '',
       guildName: this.guildName || ''
     };
+    return this._guildInfo;
   }
 
   /**
