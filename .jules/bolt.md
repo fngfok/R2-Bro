@@ -22,3 +22,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-04-27 - Criticality of Coalescing Logic Integrity
+**Learning:** Request coalescing logic is fragile; if the `Map` declaration or the `set`/`delete` calls are missing, the optimization becomes a no-op or causes memory leaks/stale data. Reviewers may misidentify this logic as dead code if not properly documented.
+**Action:** Always add explicit 'Optimization' and 'Security' comments to every interaction point of the coalescing Map (declaration, set, and delete) to preserve its integrity and prevent accidental removal.
