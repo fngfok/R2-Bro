@@ -18,8 +18,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self';");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;");
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
@@ -28,6 +28,9 @@ app.use((req, res, next) => {
 // Optimization: Regexes hoisted for performance
 const ALLY_CODE_CLEAN_REGEX = /\D/g;
 const ALLY_CODE_VALIDATE_REGEX = /^\d{9}$/;
+
+// Optimization: Map to store in-flight promises for concurrent request coalescing
+const pendingRequests = new Map();
 
 /**
  * Helper for ally code validation and cleaning.
