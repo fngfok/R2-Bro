@@ -13,6 +13,11 @@
 **Learning:** Defense-in-depth requires both application-level validation (length checks before regex) and infrastructure-level limits (express body-parser 'limit'). Modernizing security headers also means moving to `X-XSS-Protection: 0` when a strong CSP is present.
 **Prevention:** Always set explicit `limit` on body parsers and perform O(1) length checks on user input before running more complex validation logic.
 
+## 2025-05-18 - [Restoring Thundering Herd Protection & CSP Hardening]
+**Vulnerability:** A missing `pendingRequests` Map declaration caused `ReferenceError` crashes on concurrent player lookups, effectively creating a self-inflicted DoS. Additionally, the CSP lacked modern clickjacking and HTTPS enforcement.
+**Learning:** Request coalescing logic (Thundering Herd protection) is critical for stability under load. When restoring such logic, ensure the module-level state (like the `pendingRequests` Map) is also restored to avoid runtime errors.
+**Prevention:** Verify that all variables used in route handlers are declared at the appropriate scope. Always use `frame-ancestors 'none'` and `upgrade-insecure-requests` in CSP for defense-in-depth.
+
 ## 2025-05-15 - [Strict CSP and Inline Style Removal]
 **Vulnerability:** Use of `'unsafe-inline'` in `Content-Security-Policy` allowed for potential CSS-based injection or exploitation of style-based vulnerabilities.
 **Learning:** Moving all inline styles (including small markers like red asterisks) to external CSS classes is necessary to achieve a strict CSP without `'unsafe-inline'`. This requires careful auditing of all template files (EJS).
