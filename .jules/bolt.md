@@ -22,3 +22,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-05-20 - Bolt Optimization Pattern for Coalescing
+**Learning:** While the 'Concurrent Request Coalescing' pattern can be simplified by awaiting `Map.get(key)`, doing so introduces a race condition because `await` always yields to the microtask queue. This creates a window where multiple requests in the same tick can trigger redundant API calls. Additionally, the `pendingRequests` Map MUST be declared at the module level to avoid `ReferenceError`.
+**Action:** Always check the `pendingRequests` Map synchronously (`const p = Map.get(key); if (p) await p;`) to ensure absolute thundering herd protection.
