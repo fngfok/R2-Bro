@@ -100,11 +100,21 @@ footer {
     color: #7f8c8d;
     margin-top: -5px;
     margin-bottom: 5px;
+    transition: color 0.2s, font-weight 0.2s;
 }
 
 .char-counter.valid {
     color: #27ae60;
     font-weight: bold;
+}
+
+.profile-actions {
+    margin-top: 20px;
+}
+
+.gp-value {
+    border-bottom: 1px dotted #7f8c8d;
+    cursor: help;
 }
 
 .sr-only {
