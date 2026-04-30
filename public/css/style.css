@@ -80,6 +80,10 @@ footer {
     opacity: 0.7;
 }
 
+.profile-actions {
+    margin-top: 20px;
+}
+
 .required-marker {
     color: #e74c3c;
 }

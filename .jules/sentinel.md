@@ -27,3 +27,8 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2025-05-18 - [DoS Protection Restoration & Security Header Hardening]
+**Vulnerability:** A regression removed the `pendingRequests` Map, causing a `ReferenceError` and disabling concurrent request coalescing, which exposed the application to thundering herd DoS attacks.
+**Learning:** Core security/optimization logic like request coalescing can be accidentally removed during refactoring if not explicitly guarded or documented. Hardening CSP by removing `'unsafe-inline'` requires moving all inline styles to external classes.
+**Prevention:** Use descriptive comments for critical security/performance variables. Ensure security headers like HSTS use `preload` and CSP includes `frame-ancestors` and `upgrade-insecure-requests` for defense-in-depth.
