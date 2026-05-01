@@ -18,8 +18,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self';");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;");
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
@@ -58,6 +58,9 @@ const comlink = new ComlinkStub({
 // Cache initialization (TTL: 1 hour)
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
+
+// Optimization: Map to store in-flight requests to prevent thundering herd DoS
+const pendingRequests = new Map();
 
 
 /**
@@ -120,8 +123,9 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
+      // Optimization: Check for an active in-flight request for this ally code to prevent thundering herd DoS
       if (pendingRequests.has(sanitizedAllyCode)) {
+        // Security: Share the existing promise to avoid redundant API calls
         player = await pendingRequests.get(sanitizedAllyCode);
       } else {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
@@ -131,10 +135,11 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization/Security: Clean up the pending request to free memory and allow new fetches
             pendingRequests.delete(sanitizedAllyCode);
           });
 
+        // Optimization: Record the active request before awaiting
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
         player = await fetchPromise;
       }

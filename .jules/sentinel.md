@@ -27,3 +27,8 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2025-05-18 - [Thundering Herd DoS & Explicit Optimization Comments]
+**Vulnerability:** High-concurrency environments can trigger "thundering herd" issues where multiple concurrent requests for the same missing cache key result in redundant API calls, potentially leading to DoS.
+**Learning:** Implementing concurrent request coalescing using a `pendingRequests` Map is a powerful defense. However, such logic can be mistaken for dead or incomplete code by reviewers if not explicitly commented at every point of interaction (declaration, usage, cleanup).
+**Prevention:** Always add 'Optimization' and 'Security' comments to code that handles complex concurrency or non-obvious DoS protection to ensure its purpose is clear and prevent accidental removal.
