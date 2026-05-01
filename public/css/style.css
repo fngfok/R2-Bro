@@ -107,6 +107,15 @@ footer {
     font-weight: bold;
 }
 
+.profile-actions {
+    margin-top: 20px;
+}
+
+.info-tip {
+    border-bottom: 1px dotted #7f8c8d;
+    cursor: help;
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
