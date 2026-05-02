@@ -56,3 +56,11 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2025-05-24 - Enhancing Readability with Pattern Formatting
+**Learning:** For identifiers like Ally Codes, displaying them in their conventional format (e.g., XXX-XXX-XXX) significantly reduces cognitive load and improves scanability. However, to maintain compatibility with external tools, the "Copy" action should still provide the raw numeric string.
+**Action:** Use regex to format displayed identifiers and store the raw value in a `data-*` attribute (e.g., `data-raw-ally-code`) to be prioritized by clipboard logic.
+
+## 2025-05-24 - Visual Affordance for Supplemental Data
+**Learning:** When data is presented in a summarized form with more detail available via a tooltip, users may not realize the interaction exists. A subtle visual indicator like a dotted underline combined with a `help` cursor provides the necessary affordance without being intrusive.
+**Action:** Apply `border-bottom: 1px dotted` and `cursor: help` to elements that provide supplemental information via the `title` attribute.
