@@ -135,6 +135,10 @@ footer {
     top: 0;
 }
 
+.profile-actions {
+    margin-top: 20px;
+}
+
 /* Accessible focus states */
 a:focus-visible,
 button:focus-visible,
