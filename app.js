@@ -19,7 +19,7 @@ app.use((req, res, next) => {
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
   res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self';");
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;");
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
@@ -58,6 +58,9 @@ const comlink = new ComlinkStub({
 // Cache initialization (TTL: 1 hour)
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
+
+// Optimization: Map to store pending promises for active API lookups to prevent 'thundering herd' issues
+const pendingRequests = new Map();
 
 
 /**
