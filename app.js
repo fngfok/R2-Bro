@@ -29,6 +29,9 @@ app.use((req, res, next) => {
 const ALLY_CODE_CLEAN_REGEX = /\D/g;
 const ALLY_CODE_VALIDATE_REGEX = /^\d{9}$/;
 
+// Optimization: Map to store in-flight promises for request coalescing
+const pendingRequests = new Map();
+
 /**
  * Helper for ally code validation and cleaning.
  * Optimization: Uses a single pass to clean and validate.
@@ -120,24 +123,25 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
-      } else {
-        const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
+      // Optimization: Concurrent Request Coalescing (Thundering Herd prevention)
+      // Synchronous check and set to prevent race conditions during microtask yields
+      let fetchPromise = pendingRequests.get(sanitizedAllyCode);
+
+      if (!fetchPromise) {
+        fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
             const newPlayer = new Player(playerData);
             cache.set(cacheKey, newPlayer);
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization: Clean up pending request map
             pendingRequests.delete(sanitizedAllyCode);
           });
 
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
-        player = await fetchPromise;
       }
+      player = await fetchPromise;
     }
 
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
