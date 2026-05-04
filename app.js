@@ -59,6 +59,10 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization & Security: Store pending requests to coalesce concurrent calls and prevent "thundering herd" issues.
+// This Map holds promises for in-flight API requests, keyed by ally code.
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -90,15 +94,13 @@ app.set('view cache', true);
 // Static files
 // Performance Optimization: Cache static assets (CSS/JS) for 1 day in the browser
 app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
-app.use(express.json({ limit: '10kb' }));
-app.use(express.urlencoded({ extended: false, limit: '10kb' }));
 
 // Routes
 app.get('/', (req, res) => {
   res.render('index', { title: 'R2 Bro - Home' });
 });
 
-app.post('/player-search', rateLimiter, (req, res) => {
+app.post('/player-search', rateLimiter, express.json({ limit: '10kb' }), express.urlencoded({ extended: false, limit: '10kb' }), (req, res) => {
   const sanitizedAllyCode = getSanitizedAllyCode(req.body.allyCode);
 
   if (!sanitizedAllyCode) {
@@ -120,9 +122,11 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
+      // Optimization & Security: Check for pending requests to coalesce concurrent calls (Thundering Herd prevention).
+      // Using a single .get() lookup to reduce hashing overhead.
+      const pending = pendingRequests.get(sanitizedAllyCode);
+      if (pending) {
+        player = await pending;
       } else {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
@@ -131,10 +135,12 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization & Security: Ensure the promise is removed from the map regardless of success or failure.
             pendingRequests.delete(sanitizedAllyCode);
           });
 
+        // Optimization & Security: Store the promise in the map BEFORE any await to prevent race conditions
+        // that could occur due to microtask yields, ensuring subsequent concurrent requests can coalesce.
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
         player = await fetchPromise;
       }
