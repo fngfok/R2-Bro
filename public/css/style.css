@@ -119,6 +119,15 @@ footer {
     border: 0;
 }
 
+.help-info {
+    border-bottom: 1px dotted #7f8c8d;
+    cursor: help;
+}
+
+.profile-actions {
+    margin-top: 20px;
+}
+
 .skip-link {
     position: absolute;
     top: -40px;
