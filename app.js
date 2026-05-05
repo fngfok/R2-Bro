@@ -59,6 +59,9 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization: Map to store pending API requests to prevent thundering herd (request coalescing)
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,9 +123,12 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
+      // Optimization: Concurrent Request Coalescing (Thundering Herd prevention)
+      // Check if there is already a pending request for this ally code
+      // We use a single .get() lookup to avoid hashing overhead of has() + get()
+      const pending = pendingRequests.get(sanitizedAllyCode);
+      if (pending) {
+        player = await pending;
       } else {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
@@ -131,10 +137,11 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization: Remove from pending map as soon as request completes
             pendingRequests.delete(sanitizedAllyCode);
           });
 
+        // Optimization: Store the promise before any await to avoid race conditions
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
         player = await fetchPromise;
       }
