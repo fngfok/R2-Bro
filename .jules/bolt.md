@@ -22,3 +22,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-05-24 - Express Middleware Optimization Risks
+**Learning:** Relocating standard body-parsing middleware (like `express.json`) from global to route-specific usage is a micro-optimization with negligible benefit in Express. It introduces significant regression risk if other POST routes are added or overlooked.
+**Action:** Keep standard body-parsing middleware global unless there is a specific, measurable performance bottleneck that justifies the maintenance overhead and risk.
