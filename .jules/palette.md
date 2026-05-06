@@ -56,3 +56,11 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2026-05-10 - Enhancing Data Discoverability and Keyboard Accessibility
+**Learning:** Summarized data in `title` attributes is invisible to keyboard users and mobile users. Adding `tabindex="0"` and a visual indicator like a dotted underline (`border-bottom: 1px dotted`) signals that more information is available and allows keyboard focus to trigger the tooltip.
+**Action:** Always pair `title` attributes on data points with `tabindex="0"` and a `.help-text` class for visual discoverability.
+
+## 2026-05-10 - Readability vs. Copyability for Identifiers
+**Learning:** Formatted identifiers (like `XXX-XXX-XXX` for Ally Codes) are better for human reading but can be annoying if they include extra characters when copied. Using a `data-raw` attribute allows the display to be human-friendly while keeping the clipboard content machine-friendly.
+**Action:** Use a `data-raw-ally-code` attribute on formatted spans to ensure "Copy to clipboard" actions provide the clean 9-digit number.

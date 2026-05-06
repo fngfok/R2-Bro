@@ -19,21 +19,24 @@
         <% if (player && player.name) { %>
             <p><strong>Name:</strong> <%= player.name %></p>
             <p>
-                <strong>Ally Code:</strong> <span id="player-ally-code"><%= player.allyCode %></span>
+                <strong>Ally Code:</strong>
+                <span id="player-ally-code" data-raw-ally-code="<%= player.allyCode %>">
+                    <%= String(player.allyCode).slice(0, 3) %>-<%= String(player.allyCode).slice(3, 6) %>-<%= String(player.allyCode).slice(6) %>
+                </span>
                 <button id="copy-ally-code" class="search-button" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
             </p>
             <p><strong>Level:</strong> <%= player.level %></p>
-            <p><strong>GP:</strong> <span title="<%= player.getGalacticPower().toLocaleString() %>"><%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</span></p>
+            <p><strong>GP:</strong> <span class="help-text" tabindex="0" title="<%= player.getGalacticPower().toLocaleString() %>"><%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</span></p>
             <% const guildInfo = player.getGuildInfo(); %>
             <% if (guildInfo.guildName) { %>
                 <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
             <% } %>
-            <div style="margin-top: 20px;">
+            <div class="profile-actions">
                 <a href="/" class="search-button">Search Another Player</a>
             </div>
         <% } else { %>
             <p>Player not found.</p>
-            <div style="margin-top: 20px;">
+            <div class="profile-actions">
                 <a href="/" class="search-button">Back to Search</a>
             </div>
         <% } %>

@@ -135,6 +135,15 @@ footer {
     top: 0;
 }
 
+.help-text {
+    border-bottom: 1px dotted #7f8c8d;
+    cursor: help;
+}
+
+.profile-actions {
+    margin-top: 20px;
+}
+
 /* Accessible focus states */
 a:focus-visible,
 button:focus-visible,
