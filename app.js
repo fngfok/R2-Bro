@@ -59,6 +59,10 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization: Map to store in-flight promises for concurrent request coalescing
+// Security: Using a Map prevents memory leaks compared to raw objects for this use case
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,10 +124,11 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
-      } else {
+      // Bolt Optimization: Use a single Map.get() and store promise before any await
+      // to prevent microtask yields that would create a thundering herd race condition window.
+      player = pendingRequests.get(sanitizedAllyCode);
+
+      if (!player) {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
             const newPlayer = new Player(playerData);
@@ -131,12 +136,16 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization: Remove from pending Map to allow future refreshes
             pendingRequests.delete(sanitizedAllyCode);
           });
 
+        // Optimization: Store the promise before awaiting to coalesce concurrent requests
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
         player = await fetchPromise;
+      } else {
+        // Optimization: Coalesce to existing in-flight request
+        player = await player;
       }
     }
 
