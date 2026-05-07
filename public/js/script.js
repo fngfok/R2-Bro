@@ -43,7 +43,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (copyButton && allyCodeSpan) {
         copyButton.addEventListener('click', async () => {
             try {
-                await navigator.clipboard.writeText(allyCodeSpan.innerText);
+                const textToCopy = allyCodeSpan.dataset.rawAllyCode || allyCodeSpan.innerText;
+                await navigator.clipboard.writeText(textToCopy);
                 const originalText = copyButton.innerText;
                 copyButton.innerText = 'Copied! ✅';
                 copyButton.disabled = true;
