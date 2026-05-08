@@ -59,6 +59,9 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization: Map to store in-flight promises for concurrent request coalescing
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,24 +123,26 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
-      } else {
-        const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
+      // Optimization: Concurrent Request Coalescing (Thundering Herd prevention)
+      // Perform a synchronous check and store the promise before any await to prevent race conditions.
+      // Using a single Map.get() reduces hashing overhead.
+      player = pendingRequests.get(sanitizedAllyCode);
+      if (!player) {
+        player = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
             const newPlayer = new Player(playerData);
             cache.set(cacheKey, newPlayer);
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization: Clean up the pending request promise
             pendingRequests.delete(sanitizedAllyCode);
           });
 
-        pendingRequests.set(sanitizedAllyCode, fetchPromise);
-        player = await fetchPromise;
+        // Optimization: Store the promise immediately to coalesce any subsequent concurrent requests
+        pendingRequests.set(sanitizedAllyCode, player);
       }
+      player = await player;
     }
 
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
