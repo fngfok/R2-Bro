@@ -22,3 +22,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-05-15 - Fixing and Optimizing Request Coalescing
+**Learning:** The application had logical usage of a `pendingRequests` Map for coalescing concurrent API calls, but the declaration itself was missing, leading to `ReferenceError` under load or in tests. Furthermore, replacing `has()` + `get()` with a single `get()` call avoids redundant hashing operations in the hot path.
+**Action:** Ensure all module-level state used for optimizations is explicitly declared and documented. Use single-lookup patterns for Map/Cache access to maximize performance in request handlers.
