@@ -56,3 +56,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2025-05-23 - Progressive Disclosure with Keyboard Accessibility
+**Learning:** Using `title` attributes for tooltips is a good way to provide detailed data (like exact GP values) without UI clutter. However, these are not accessible to keyboard-only users by default. Adding `tabindex="0"` and a visual cue like a dotted underline ensures all users can discover and access this information.
+**Action:** When using `title` for supplementary info, always include `tabindex="0"` and a `.help-text` class (dotted underline) for discoverability and accessibility.
