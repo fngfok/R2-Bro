@@ -18,8 +18,8 @@ app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'DENY');
   // Modern browsers ignore X-XSS-Protection; disabling it prevents potential side-channel attacks
   res.setHeader('X-XSS-Protection', '0');
-  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self';");
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  res.setHeader('Content-Security-Policy', "default-src 'self'; script-src 'self'; object-src 'none'; style-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   next();
@@ -28,6 +28,10 @@ app.use((req, res, next) => {
 // Optimization: Regexes hoisted for performance
 const ALLY_CODE_CLEAN_REGEX = /\D/g;
 const ALLY_CODE_VALIDATE_REGEX = /^\d{9}$/;
+
+// Optimization: Map to store in-flight promises for concurrent request coalescing
+// Security: Prevents "thundering herd" DoS on the upstream API
+const pendingRequests = new Map();
 
 /**
  * Helper for ally code validation and cleaning.
@@ -120,9 +124,13 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
+      // Optimization: Concurrent Request Coalescing (Thundering Herd prevention)
+      // Check if there is already a pending request for this ally code
+      // Security: Single Map.get() reduces hashing overhead and prevents race conditions
+      const pending = pendingRequests.get(sanitizedAllyCode);
+
+      if (pending) {
+        player = await pending;
       } else {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
@@ -131,10 +139,11 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization/Security: Ensure the promise is removed from the map regardless of outcome
             pendingRequests.delete(sanitizedAllyCode);
           });
 
+        // Optimization: Store the promise in the Map before any await to ensure immediate coalescing
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
         player = await fetchPromise;
       }

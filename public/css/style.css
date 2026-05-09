@@ -107,6 +107,10 @@ footer {
     font-weight: bold;
 }
 
+.profile-actions {
+    margin-top: 20px;
+}
+
 .sr-only {
     position: absolute;
     width: 1px;
