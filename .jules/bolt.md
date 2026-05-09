@@ -22,3 +22,7 @@ Critical learnings and findings related to performance in R2 Bro.
 ## 2026-05-10 - Concurrent Request Coalescing
 **Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
 **Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+
+## 2026-06-12 - [Request Coalescing Optimization]
+**Learning:** Using `Map.has()` followed by `Map.get()` results in redundant hashing and lookups. A single `Map.get()` call is more efficient. Additionally, for thundering herd protection to be effective, the promise MUST be stored in the tracking Map before any `await` or asynchronous yield to prevent race conditions where multiple requests enter the "missing cache" branch simultaneously.
+**Action:** Always prefer a single `Map.get()` and check for null/undefined. Ensure tracking state is updated synchronously before any `await` keyword.
