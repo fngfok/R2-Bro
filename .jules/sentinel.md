@@ -27,3 +27,8 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2025-05-20 - [Request Coalescing ReferenceError & CSP Hardening]
+**Vulnerability:** Missing declaration of `pendingRequests` Map caused application crashes (ReferenceError) when handling concurrent requests for uncached data, effectively disabling Thundering Herd protection and creating a DoS vector.
+**Learning:** Concurrent request coalescing requires a persistent module-level state. Removing its declaration by mistake can lead to critical failures. Additionally, a truly strict CSP requires both header hardening (`frame-ancestors 'none'`) and template-level compliance (removing all inline styles) to eliminate the need for `'unsafe-inline'`.
+**Prevention:** Always verify that all variables used in complex optimization/security patterns are properly declared at the correct scope. Use external CSS classes instead of inline styles to maintain CSP integrity.
