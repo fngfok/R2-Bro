@@ -20,5 +20,5 @@ Critical learnings and findings related to performance in R2 Bro.
 **Action:** Cache the fully instantiated Model objects instead of raw JSON. Implement memoization for expensive property lookups or calculations within the Model class to ensure O(1) access after the first call.
 
 ## 2026-05-10 - Concurrent Request Coalescing
-**Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls.
-**Action:** Use a `Map` of pending promises to coalesce concurrent requests for the same resource. Ensure the promise is removed from the map in a `finally` block to prevent stale "pending" states on failure.
+**Learning:** High-concurrency environments can trigger "thundering herd" problems where multiple simultaneous requests for the same missing cache key result in redundant, expensive API calls. A common pitfall is a race condition window if the check and storage are not synchronous.
+**Action:** Use a `Map` of pending promises to coalesce concurrent requests. Perform a single synchronous `Map.get()` lookup and store the resulting promise in the Map *before* any `await` or microtask yield. Ensure cleanup in a `finally` block.
