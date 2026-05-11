@@ -56,3 +56,11 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2026-05-10 - Improving Discoverability of Supplementary Information
+**Learning:** Native browser tooltips (via the `title` attribute) are often invisible to users. Adding a visual affordance like a dotted underline and a help cursor indicates that more information is available. Furthermore, adding `tabindex="0"` allows keyboard-only users to focus the element, enabling screen readers to potentially announce the title.
+**Action:** Apply a `.help-text` class (dotted underline + help cursor) and `tabindex="0"` to elements using the `title` attribute for supplementary data.
+
+## 2026-05-10 - Strict CSP and External Styles
+**Learning:** Strict Content Security Policy (CSP) settings that forbid inline styles require even minor layout adjustments (like margins) to be moved to external CSS classes.
+**Action:** Use semantic or utility classes (e.g., `.profile-actions`) in external stylesheets instead of inline `style` attributes to maintain CSP compliance.
