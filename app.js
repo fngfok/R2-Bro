@@ -59,6 +59,10 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization: Pending requests map for concurrent request coalescing (Thundering Herd protection)
+// Security: Essential to prevent ReferenceError crashes and reduce backend load under high concurrency
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,24 +124,25 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
-      } else {
-        const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
+      // Optimization: Use a single Map.get() lookup instead of has() + get() to reduce hashing overhead
+      // Security: Check for already pending requests to coalesce concurrent calls (Thundering Herd protection)
+      let fetchPromise = pendingRequests.get(sanitizedAllyCode);
+
+      if (!fetchPromise) {
+        fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
             const newPlayer = new Player(playerData);
             cache.set(cacheKey, newPlayer);
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
+            // Optimization & Security: Ensure promise is removed to prevent stale states and memory leaks
             pendingRequests.delete(sanitizedAllyCode);
           });
 
         pendingRequests.set(sanitizedAllyCode, fetchPromise);
-        player = await fetchPromise;
       }
+      player = await fetchPromise;
     }
 
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
