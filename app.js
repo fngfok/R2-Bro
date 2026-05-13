@@ -59,6 +59,9 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+// Optimization/Security: Store pending API requests to prevent thundering herd (Concurrent Request Coalescing)
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,9 +123,13 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
+      // Optimization/Security: Check for an existing pending request to coalesce concurrent calls (Thundering Herd Protection)
+      // Single Map.get() lookup reduces hashing overhead compared to has() + get()
+      // Using cacheKey for the Map key ensures consistency and prevents potential collisions
+      const pendingPromise = pendingRequests.get(cacheKey);
+
+      if (pendingPromise) {
+        player = await pendingPromise;
       } else {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
@@ -131,11 +138,12 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
-            pendingRequests.delete(sanitizedAllyCode);
+            // Optimization/Security: Remove the promise from the Map once complete to prevent stale pending states
+            pendingRequests.delete(cacheKey);
           });
 
-        pendingRequests.set(sanitizedAllyCode, fetchPromise);
+        // Optimization/Security: Store the promise synchronously before any await to prevent race conditions
+        pendingRequests.set(cacheKey, fetchPromise);
         player = await fetchPromise;
       }
     }
