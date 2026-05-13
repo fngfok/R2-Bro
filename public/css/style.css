@@ -41,6 +41,11 @@ main {
     outline: 3px solid #3498db;
     outline-offset: 2px;
 }
+
+.help-text {
+    cursor: help;
+    text-decoration: underline dotted;
+}
 button {
     padding: 10px;
     background-color: #3498db;

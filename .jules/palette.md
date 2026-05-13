@@ -56,3 +56,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2026-04-25 - Visual Affordance for Tooltips
+**Learning:** Elements with supplementary information in a `title` attribute are often overlooked if they lack visual cues. A `cursor: help` and `text-decoration: underline dotted` provide a standard affordance that informs users more information is available on hover or focus.
+**Action:** Apply a `.help-text` class to elements using `title` attributes for data transparency and ensure they are focusable with `tabindex="0"`.
