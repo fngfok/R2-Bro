@@ -23,7 +23,7 @@
                 <button id="copy-ally-code" class="search-button" aria-label="Copy Ally Code" title="Copy to clipboard">Copy</button>
             </p>
             <p><strong>Level:</strong> <%= player.level %></p>
-            <p><strong>GP:</strong> <span title="<%= player.getGalacticPower().toLocaleString() %>"><%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</span></p>
+            <p><strong>GP:</strong> <span class="help-text" title="<%= player.getGalacticPower().toLocaleString() %>" tabindex="0"><%= (player.getGalacticPower() / 1e6).toFixed(2) %>M</span></p>
             <% const guildInfo = player.getGuildInfo(); %>
             <% if (guildInfo.guildName) { %>
                 <p><strong>Guild:</strong> <%= guildInfo.guildName %></p>
