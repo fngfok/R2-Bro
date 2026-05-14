@@ -27,3 +27,8 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2026-05-14 - [Thundering Herd Protection & CSP Compliance]
+**Vulnerability:** ReferenceError for `pendingRequests` caused application crashes and disabled thundering herd protection, leaving the app vulnerable to DoS. Inline styles in templates violated strict CSP.
+**Learning:** Security-critical state like request coalescing maps must be preserved at the module level. Moving inline styles to CSS classes is a recurring pattern for achieving strict CSP in EJS-based apps.
+**Prevention:** Always verify that all variables used in optimization/security logic are properly declared. Use external stylesheets for all UI spacing/layout to maintain strict CSP.
