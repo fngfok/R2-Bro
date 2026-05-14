@@ -59,6 +59,12 @@ const comlink = new ComlinkStub({
 // Optimization: disabled cloning for better performance since cached objects are not mutated
 const cache = new NodeCache({ stdTTL: 3600, useClones: false });
 
+/**
+ * Optimization: Pending requests Map for concurrent request coalescing (Thundering Herd protection).
+ * Security: Prevents excessive API calls and potential DoS during high-concurrency periods.
+ */
+const pendingRequests = new Map();
+
 
 /**
  * Simple Rate Limiting Middleware using node-cache
@@ -120,10 +126,12 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
     let player = cache.get(cacheKey);
 
     if (!player) {
-      // Check if there is already a pending request for this ally code to coalesce concurrent calls
-      if (pendingRequests.has(sanitizedAllyCode)) {
-        player = await pendingRequests.get(sanitizedAllyCode);
-      } else {
+      // Optimization: Concurrent Request Coalescing (Thundering Herd protection)
+      // Check for an existing pending promise for this resource to avoid redundant API calls
+      // Using cacheKey for consistency and single Map.get() to minimize hashing overhead
+      player = pendingRequests.get(cacheKey);
+
+      if (!player) {
         const fetchPromise = comlink.getPlayer(sanitizedAllyCode)
           .then(playerData => {
             const newPlayer = new Player(playerData);
@@ -131,15 +139,21 @@ app.get('/player/:allyCode', rateLimiter, async (req, res) => {
             return newPlayer;
           })
           .finally(() => {
-            // Ensure the promise is removed from the map regardless of success or failure
-            pendingRequests.delete(sanitizedAllyCode);
+            // Optimization: Remove from pending map immediately to allow fresh fetches later
+            pendingRequests.delete(cacheKey);
           });
 
-        pendingRequests.set(sanitizedAllyCode, fetchPromise);
-        player = await fetchPromise;
+        // Optimization: Synchronously store the promise before any await to prevent race conditions
+        pendingRequests.set(cacheKey, fetchPromise);
+        player = fetchPromise;
       }
+
+      // Wait for the coalesced or newly created fetch promise
+      player = await player;
     }
 
+    // Performance Optimization: Enable browser/CDN caching for 5 minutes for player profiles
+    res.setHeader('Cache-Control', 'public, max-age=300');
     res.render('player', { title: `Player Profile - ${sanitizedAllyCode}`, player: player });
   } catch (error) {
     console.error('Error fetching player data:', error);
