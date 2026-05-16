@@ -27,3 +27,8 @@
 **Vulnerability:** IP-based rate limiting was ineffective when the app was deployed behind a proxy (all traffic shared the proxy IP). Additionally, a simple increment-based cache allowed users to "slide" their rate limit window by making frequent requests.
 **Learning:** `app.set('trust proxy', 1)` is essential for accurate IP detection in Express. Using `node-cache.getTtl()` allows calculating the exact remaining duration of a window, enabling a strict fixed-window strategy that prevents window extension via frequent hits.
 **Prevention:** Always configure `trust proxy` in production-ready Express apps. Implement strict windowing by preserving the original TTL during cache updates.
+
+## 2025-05-18 - [Restoration of Request Coalescing]
+**Vulnerability:** A `ReferenceError` on `pendingRequests` caused the application to crash under cache-miss conditions, while also leaving it vulnerable to Thundering Herd DoS attacks.
+**Learning:** Security and performance are often intertwined. Restoring a "performance optimization" like request coalescing was actually a critical security fix for application availability.
+**Prevention:** Always verify that all variables used in core request-handling logic are properly declared at the module level and protected by explicit 'Security' comments to prevent accidental deletion during "cleanup" phases.
