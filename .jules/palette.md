@@ -56,3 +56,7 @@ This journal documents critical UX and accessibility learnings encountered durin
 ## 2026-04-25 - Data Transparency with Progressive Detail
 **Learning:** Users appreciate summarized data (like "5.43M" GP) for quick scanning but often need the exact value for precise comparisons. Using the native `title` attribute on summarized values provides this detail without cluttering the UI.
 **Action:** Wrap summarized numeric values in a `<span>` with a `title` attribute containing the full, formatted number.
+
+## 2026-05-18 - Readability vs. Interoperability for Identifiers
+**Learning:** Formatting identifiers (like `123-456-789`) improves UI readability but can break copy-paste interoperability with tools requiring raw data.
+**Action:** Use `data-*` attributes to store raw values and ensure clipboard logic prioritizes them over visible formatted text.
